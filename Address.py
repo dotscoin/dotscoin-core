@@ -7,6 +7,9 @@ class Address:
         self.sk = SigningKey.generate()
         self.vk = self.sk.verifying_key
 
+    def __init__(self, vk):
+        self.vk = vk
+
     def load(self, sk, vk) -> None:
         """ Loads Signing Key and Verifying key from external source."""
         self.sk = SigningKey.from_pem(sk)

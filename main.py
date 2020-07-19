@@ -10,10 +10,6 @@ class BlockChain:
     pass
 
 
-class Block:
-    pass
-
-
 class Miner:
     pass
 
