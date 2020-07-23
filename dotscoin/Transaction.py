@@ -1,6 +1,6 @@
 from datetime import datetime
 import hashlib
-from ecdsa import VerifyingKey
+from ecdsa import VerifyingKey, BadSignatureError
 
 class Transaction:
     def __init__(self):
@@ -42,7 +42,22 @@ class Transaction:
         self.signature = sk.sign(self.display().encode("utf-8")).hex()
 
     def verify_signature(self, vk: VerifyingKey):
-        print(vk.verify(bytes.fromhex(self.signature), self.display().encode("utf-8")))
+        try:
+            vk.verify(bytes.fromhex(self.signature), self.display().encode("utf-8"))
+            return True
+        except BadSignatureError:
+            return False
 
+    def broadcast_transaction(self):
+        message = {
+            'timestamp': datetime.timestamp(self.timestamp),
+            'version': self.version,
+            'input': str(self.input),
+            'output': str(self.output),
+            'signature': self.signature,
+            'hash': self.hash
+        }
+
+        return message
 
 

@@ -13,5 +13,7 @@ if __name__ == '__main__':
 
     print(transaction.signature)
 
-    transaction.verify_signature(address.vk)
+    # transaction.add_input("sadsfhjih")
+
+    print(transaction.verify_signature(address.vk))
 
