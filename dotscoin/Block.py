@@ -1,5 +1,5 @@
 from datetime import datetime
-from Transaction import Transaction
+from dotscoin.Transaction import Transaction
 import hashlib
 from typing import List
 

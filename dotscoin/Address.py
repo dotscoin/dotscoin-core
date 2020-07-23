@@ -1,6 +1,6 @@
 from typing import Any
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
-
+import hashlib
 
 class Address:
     def __init__(self):
@@ -22,3 +22,13 @@ class Address:
             return True
         except BadSignatureError:
             return False
+
+    def display(self):
+        print(self.vk.to_string().hex())
+
+    def get_public_address(self) -> str:
+        sha_hash_pk = hashlib.sha256(self.vk.to_string().hex().encode('utf-8')).hexdigest()
+        h = hashlib.new('ripemd160')
+        h.update(sha_hash_pk.encode('utf-8'))
+
+        return h.hexdigest()

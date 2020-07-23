@@ -1,5 +1,6 @@
 from datetime import datetime
 import hashlib
+from ecdsa import VerifyingKey
 
 class Transaction:
     def __init__(self):
@@ -19,11 +20,29 @@ class Transaction:
 
     def generate_hash(self):
         message = {
-            'timestamp': self.timestamp,
+            'timestamp': datetime.timestamp(self.timestamp),
             'version': self.version,
             'input': str(self.input),
             'output': str(self.output)
         }
 
-        return hashlib.sha256(str(message).encode())
+        self.hash = hashlib.sha256(str(message).encode()).hexdigest()
+
+    def display(self):
+        message = {
+            'timestamp': datetime.timestamp(self.timestamp),
+            'version': self.version,
+            'input': str(self.input),
+            'output': str(self.output)
+        }
+
+        return str(message)
+
+    def generate_signature(self, sk):
+        self.signature = sk.sign(self.display().encode("utf-8")).hex()
+
+    def verify_signature(self, vk: VerifyingKey):
+        print(vk.verify(bytes.fromhex(self.signature), self.display().encode("utf-8")))
+
+
 
