@@ -1,5 +1,5 @@
 from typing import List
-from Block import Block
+from dotscoin.Block import Block
 
 
 class BlockChain:

@@ -1,12 +1,12 @@
 from queue import LifoQueue
-
+from dotscoin.Transaction import Transaction
 
 class Mempool:
     """ This class stores all the transactions in a temporary cache memory for block generation. """
-    def __int__(self):
+    def __init__(self):
         self.transactions = LifoQueue(maxsize=8000)
 
-    def add_transaction(self, val) -> bool:
+    def add_transaction(self, val: Transaction) -> bool:
         """
         This function add transaction to the mempool for further processing
 
@@ -21,7 +21,7 @@ class Mempool:
         self.transactions.put(val)
         return True
 
-    def get_transaction(self) -> object:
+    def get_transaction(self) -> Transaction:
         return self.transactions.get()
 
     def get_size(self) -> int:
