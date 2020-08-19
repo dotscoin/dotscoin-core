@@ -13,5 +13,5 @@ if __name__ == '__main__':
     transaction.generate_signature(address.sk)
     print(transaction.signature)
     print(transaction.verify_signature(address.vk))
-    print(mempool.get_transaction().display())
-
+    print(mempool.get_transaction())
+    print(mempool.get_size())
