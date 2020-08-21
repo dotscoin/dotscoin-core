@@ -4,14 +4,7 @@ from dotscoin.Mempool import Mempool
 
 if __name__ == '__main__':
     address = Address()
-    transaction = Transaction()
-    mempool = Mempool()
-
-    transaction.add_input("fhfhh")
-    transaction.add_output("yhgyhgg")
-    mempool.add_transaction(transaction)
-    transaction.generate_signature(address.sk)
-    print(transaction.signature)
-    print(transaction.verify_signature(address.vk))
-    print(mempool.get_transaction().display())
+    
+    print(address.export())
+    print(address.get_public_address())
 

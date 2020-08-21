@@ -1,0 +1,1 @@
+sudo yum install git python3 gcc gmp gmp-devel gmp-status python3-devel mpfr-devel libmpc-devel -y

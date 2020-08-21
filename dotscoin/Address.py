@@ -32,3 +32,9 @@ class Address:
         h.update(sha_hash_pk.encode('utf-8'))
 
         return h.hexdigest()
+
+    def export(self) -> dict:
+        return {
+            'vk': self.vk.to_pem().decode("utf-8"),
+            'sk': self.sk.to_pem().decode("utf-8")
+        }
