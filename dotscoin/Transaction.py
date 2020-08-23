@@ -1,16 +1,25 @@
 from datetime import datetime
 import hashlib
 from ecdsa import VerifyingKey, BadSignatureError
+from enum import Enum
+from dotscoin.TransactionInput import TransactionInput
+from typing import List
+
+class TransactionStatus(str, Enum):
+    UNCONFIRMED = "Unconfirmed"
+    CONFIRMED = "Confirmed"
 
 class Transaction:
-    def __init__(self):
-        self.timestamp = datetime.now()
-        self.version: str = "0.0.1"
-        self.hash: str = ""
-        self.input = []
-        self.output = []
-        self.signature: str = ""
-        self.is_coinbase: bool = False
+    timestamp = datetime.now()
+    version: str = "0.0.1"
+    hash: str = ""
+    input: List[TransactionInput] = []
+    output: List[TransactionOutput] = []
+    signature: str = ""
+    is_coinbase: bool = False
+    status = TransactionStatus.UNCONFIRMED
+    block = "Mempool"
+    fees = 0
 
     def add_input(self, transaction):
         self.input.append(transaction)
