@@ -1,7 +1,6 @@
 from typing import List
 from dotscoin.Block import Block
 
-
 class BlockChain:
     def __init__(self):
         self.data = ""

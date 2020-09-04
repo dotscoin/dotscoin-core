@@ -1,8 +1,11 @@
 import socket
 import selectors
 import types
-
-host = '127.0.0.1'
+import os
+import multiprocessing
+from threads.broadcaster import broadcast_election
+from threads.rpc import rpc_receive
+host = '172.31.7.165'
 port = 8000
 
 sel = selectors.DefaultSelector()
@@ -38,6 +41,15 @@ lsock.listen()
 print('listening on', (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
+cpucount = os.cpu_count()
+print("total cpu cores in the system=",cpucount)
+if cpucount < 4:
+    print("this version of software can't run on your system")
+    exit()
+rpc=multiprocessing.Process(target=rpc_receive)
+rpc.start()
+broadcast=multiprocessing.Process(target=broadcast_election)
+broadcast.start()
 
 while True:
     events = sel.select(timeout=None)
