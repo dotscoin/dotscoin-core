@@ -5,7 +5,7 @@ import os
 import multiprocessing
 from threads.broadcaster import broadcast_election
 from threads.rpc import rpc_receive
-host = '172.31.7.165'
+host = '0.0.0.0'
 port = 8000
 
 sel = selectors.DefaultSelector()
