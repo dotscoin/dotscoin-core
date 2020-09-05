@@ -4,7 +4,7 @@ from ecdsa import VerifyingKey, BadSignatureError
 from enum import Enum
 from dotscoin.TransactionInput import TransactionInput
 from typing import List
-
+import dotscoin.Address import Address
 class TransactionStatus(str, Enum):
     UNCONFIRMED = "Unconfirmed"
     CONFIRMED = "Confirmed"
@@ -13,26 +13,24 @@ class Transaction:
     timestamp = datetime.now()
     version: str = "0.0.1"
     hash: str = ""
-    input: List[TransactionInput] = []
-    output: List[TransactionOutput] = []
-    signature: str = ""
+    inputs: List[TransactionInput] = []
+    outputs: List[TransactionOutput] = []
     is_coinbase: bool = False
     status = TransactionStatus.UNCONFIRMED
     block = "Mempool"
-    fees = 0
-
+    verifyingkey: str = ""
     def add_input(self, transaction):
-        self.input.append(transaction)
+        self.inputs.append(transaction)
 
     def add_output(self, address):
-        self.output.append(address)
+        self.outputs.append(address)
 
     def generate_hash(self):
         message = {
             'timestamp': datetime.timestamp(self.timestamp),
             'version': self.version,
-            'input': str(self.input),
-            'output': str(self.output)
+            'input': str(self.inputs),
+            'output': str(self.outputs)
         }
 
         self.hash = hashlib.sha256(str(message).encode()).hexdigest()
@@ -41,8 +39,8 @@ class Transaction:
         message = {
             'timestamp': datetime.timestamp(self.timestamp),
             'version': self.version,
-            'input': str(self.input),
-            'output': str(self.output)
+            'input': str(self.inputs),
+            'output': str(self.outputs)
         }
 
         return str(message)
@@ -66,7 +64,37 @@ class Transaction:
             'signature': self.signature,
             'hash': self.hash
         }
-
         return message
 
+    def coinbase_transaction(self):
+        if self.is_coinbase == True:
+            self.input = []
 
+    def check_transaction(self):
+        if not isinstance(self.timestamp,datetime.datetime):
+            return False
+        if not isinstance(self.version, str):
+            return False
+        if not isinstance(self.hash , str):
+            return False
+        if not isinstance(self.input,List[TransactionInput]):
+            return False
+        if not isinstance(self.output,List[TransactionOutput]):
+            return False
+        if not isinstance(self.signature,str):
+            return False
+        if not isinstance(self.status,TransactionStatus):
+            return False
+        if not isinstance(self.fees,int):
+            return False
+        return True
+
+    def verify_transaction(self):
+        for i,input in enumerate(self.input):
+            address=Address()
+            if address.verify_signature(input['prev_out']['script'],self.verifyingkey):
+                continue
+            else: 
+                return False
+        return True
+              
