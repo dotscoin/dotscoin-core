@@ -3,6 +3,7 @@ import hashlib
 from ecdsa import VerifyingKey, BadSignatureError
 from enum import Enum
 from dotscoin.TransactionInput import TransactionInput
+from dotscoin.TransactionOutput import TransactionOutput
 from typing import List
 
 class TransactionStatus(str, Enum):
