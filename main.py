@@ -1,7 +1,5 @@
 from dotscoin.Address import Address
 from dotscoin.Transaction import Transaction
-from dotscoin.Mempool import Mempool
-from dotscoin.Block import Block
 
 if __name__ == '__main__':
     address = Address()
