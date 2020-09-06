@@ -27,3 +27,14 @@ class Mempool:
 
     def get_size(self) -> int:
         return self.redis_client.llen("mempool")
+
+    def remove_transaction(self, hash):
+        i = 0
+        while True:
+            tx = self.redis_client.lindex('mempool', i).decode('utf-8')
+            if tx == None:
+                return
+            if tx.hash == hash:
+                self.redis_client.lrem('mempool', i)
+            i = i + 1
+        return
