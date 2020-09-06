@@ -55,13 +55,15 @@ class Transaction:
             return False
 
     def broadcast_transaction(self):
+        input_tx = [ input.to_json() for input in self.inputs]
+        output_tx= [ output.to_json() for output in self.outputs]
         message = {
             'timestamp': datetime.timestamp(self.timestamp),
             'version': self.version,
-            'input': str(self.inputs),
-            'output': str(self.outputs),
-            # 'signature': self.signature,
-            'hash': self.hash
+            'inputs': input_tx,
+            'outputs': output_tx,
+            'hash': self.hash,
+            'block':self.block
         }
         return message
 

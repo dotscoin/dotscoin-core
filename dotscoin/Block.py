@@ -25,13 +25,14 @@ class Block:
 
     def compute_hash(self):
         message={
-            "timestamp":self.timestamp,
+            "timestamp": datetime.timestamp(self.timestamp),
             "transactions": self.transactions,
             "previous_block_hash":self.previous_block_hash,
             "height":self.height,
             "version":self.version,
             "merkle_root":self.merkle_root
         }
+    
         self.hash= hashlib.sha256(str(message).encode()).hexdigest()
 
     def calculate_merkle_root(self, transactions=[]):
@@ -55,7 +56,5 @@ class Block:
             return
         else:
             self.calculate_merkle_root(new_tran)
-        # self.merkle_root = new_tran[0] if (len(new_tran) == 1) else self.calculate_merkle_root(new_tran)
-        # print(self.merkle_root)
-
+        
     
