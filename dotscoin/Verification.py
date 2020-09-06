@@ -16,13 +16,19 @@ class Verification:
         tx_verdict = "pending"
 
         for input in inputs:
-            for i in self.redis_client.llen('chain'):
+            i = 0
+            # block = json.loads(self.redis_client.lindex('chain', -1).decode('utf-8'))
+            while True:
                 block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+                if block == None:
+                    tx_verdict = "verified"
+                    return tx_verdict
                 for tx in block.txs:
                     for out in tx.outs:
                         if out.tx_index == input.prev_out.tx_index and out.hash == input.prev_out.hash :
                             tx_verdict = "transaction rejected"
                             return tx_verdict
+                i = i + 1
         
         tx_verdict = "verified"
         return tx_verdict
@@ -40,7 +46,7 @@ class Verification:
 
     def full_chain_verify(self):
         for i in range(0,self.chain_length):
-            block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
             v_merkl_root = self.block.calculate_merkle_root(block.txs)
             if v_merkl_root != block.merkle_root: 
                 return i
