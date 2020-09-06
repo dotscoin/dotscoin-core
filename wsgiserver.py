@@ -14,6 +14,7 @@ class Server:
         self.port = port
         self.server = make_server(self.listen, self.port, self.wsgi_app,
                                   ThreadingWSGIServer)
-
+   
     def serve_forever(self):
+        print("rpc server  started on:",host,port)
         self.server.serve_forever()

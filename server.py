@@ -3,10 +3,10 @@ import selectors
 import types
 import os
 import multiprocessing
-from threads.broadcaster import broadcast_election
+from threads.broadcast_receiver import *    
 from threads.rpc import rpc_receive
 host = '0.0.0.0'
-port = 8000
+port = 8080
 
 sel = selectors.DefaultSelector()
 
@@ -48,7 +48,7 @@ if cpucount < 4:
     exit()
 rpc=multiprocessing.Process(target=rpc_receive)
 rpc.start()
-broadcast=multiprocessing.Process(target=broadcast_election)
+broadcast=multiprocessing.Process(target=broadcast_receive)
 broadcast.start()
 
 while True:
