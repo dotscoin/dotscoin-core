@@ -52,6 +52,14 @@ class Block:
             else:
                 h.update(((new_tran[i]) + (new_tran[i+1])).encode("UTF-8"))
                 new_tran.append(h.hexdigest())
-        self.merkle_root = new_tran[0] if (len(new_tran) == 1) else self.calculate_merkle_root(new_tran)
+        # self.merkle_root = new_tran[0] if (len(new_tran) == 1) else self.calculate_merkle_root(new_tran)
+        if len(new_tran) == 1 :
+            print(self.merkle_root)
+            self.merkle_root = new_tran[0]
+        else:
+            self.calculate_merkle_root(new_tran)
+
+
+
 
     
