@@ -5,7 +5,8 @@ from enum import Enum
 from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
 from typing import List
-import dotscoin.Address import Address
+from dotscoin.Address import Address
+
 class TransactionStatus(str, Enum):
     UNCONFIRMED = "Unconfirmed"
     CONFIRMED = "Confirmed"
@@ -17,9 +18,7 @@ class Transaction:
     inputs: List[TransactionInput] = []
     outputs: List[TransactionOutput] = []
     is_coinbase: bool = False
-    status = TransactionStatus.UNCONFIRMED
     block = "Mempool"
-    verifyingkey: str = ""
     def add_input(self, transaction):
         self.inputs.append(transaction)
 
