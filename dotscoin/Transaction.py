@@ -17,9 +17,7 @@ class Transaction:
     inputs: List[TransactionInput] = []
     outputs: List[TransactionOutput] = []
     is_coinbase: bool = False
-    status = TransactionStatus.UNCONFIRMED
     block = "Mempool"
-    verifyingkey: str = ""
     def add_input(self, transaction):
         self.inputs.append(transaction)
 
@@ -60,9 +58,9 @@ class Transaction:
         message = {
             'timestamp': datetime.timestamp(self.timestamp),
             'version': self.version,
-            'input': str(self.input),
-            'output': str(self.output),
-            'signature': self.signature,
+            'input': str(self.inputs),
+            'output': str(self.outputs),
+            # 'signature': self.signature,
             'hash': self.hash
         }
         return message

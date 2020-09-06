@@ -16,3 +16,5 @@ class BlockChain:
         file = open("chain.txt", "w")
         file.write(self.data)
         file.close()
+    
+    
