@@ -5,7 +5,7 @@ from enum import Enum
 from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
 from typing import List
-import dotscoin.Address import Address
+from dotscoin.Address import Address
 class TransactionStatus(str, Enum):
     UNCONFIRMED = "Unconfirmed"
     CONFIRMED = "Confirmed"
