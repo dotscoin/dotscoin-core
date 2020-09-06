@@ -3,7 +3,8 @@ from dotscoin.Block import Block
 from dotscoin.Transaction import Transaction
 from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
-import sys
+from datetime import datetime
+from utils import getsize
 output=TransactionOutput()
 output.address="1d3f347aada53547142da8edea5e0019e6ef31bb15"
 output.n=0
@@ -11,16 +12,17 @@ output.value=50
 transaction = Transaction()
 transaction.add_output(output)
 transaction.is_coinbase = True
-transaction.generate_hash()
+transaction.hash="eef9fda50a6bf6c11c5078d8772d94"
 block = Block("")
 block.add_transaction(transaction)
 block.calculate_merkle_root()
-block.hash=block.compute_hash()
+block.compute_hash()
 block.miner="1d3f347aada53547142da8edea5e0019e6ef31bb15"
-block.size=sys.getsizeof(block)
+block.size=getsize(block.__dict__)
+print(block.__dict__)
 message= {
     "hash":block.hash,
-    "timestamp":block.timestamp,
+    "timestamp":datetime.timestamp(block.timestamp),
     "transaction":block.transactions[0].broadcast_transaction(),
     "previous_block_hash":block.previous_block_hash,
     "merkle_root":block.merkle_root,
