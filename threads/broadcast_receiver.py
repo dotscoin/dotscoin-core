@@ -4,8 +4,16 @@ from datetime import datetime
 import socket
 import threading
 import requests
+import json
+import zmq
 host = '0.0.0.0'
 port = 6040
+
+context = zmq.Context()
+socke = context.socket(zmq.REP)
+socke.bind("tcp://127.0.0.2:5555")
+
+
 def get_nodes():
     base_url="http://dns.dotscoin.com/get_nodes/"
     nodes = requests.get(base_url)
@@ -97,6 +105,13 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
             self.sock.sendto(resp.encode('utf-8'), client_address)
         print('\n', resp, '\n')
 
+    def zmq_receiver(self):
+        print('zmq function')
+        if socke.recv_string(): 
+            receive_data=json.loads(socke.recv_string())
+            print('zmq function')
+            print(receive_data)
+
     def wait_for_client(self):
         ''' Wait for clients and handle their requests '''
 
@@ -104,12 +119,18 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
             while True: # keep alive
 
                 try: # receive request from client
-                    data, client_address = self.sock.recvfrom(1024)
+                    z_mq_thread=threading.Thread(target=self.zmq_receiver)
+                    z_mq_thread.start()
+                    # data, client_address = self.sock.recvfrom(1024)
+                    print("here")
+                    z_mq_thread=threading.Thread(target=self.zmq_receiver)
+                    z_mq_thread.start()
+                    # c_thread = threading.Thread(target = self.handle_request,
+                    #                         args = (data, client_address))
+                    # c_thread.daemon = True
+                    # c_thread.start()
 
-                    c_thread = threading.Thread(target = self.handle_request,
-                                            args = (data, client_address))
-                    c_thread.daemon = True
-                    c_thread.start()
+
 
                 except OSError as err:
                     self.printwt(err)
