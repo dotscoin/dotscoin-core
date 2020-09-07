@@ -1,3 +1,4 @@
+
 import sys
 import time
 from datetime import datetime
@@ -6,13 +7,13 @@ import threading
 import requests
 import json
 host = '0.0.0.0'
-port = 6040
+port = 7000
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind((host,port))
 INVALID_DATA=False
 def response_handler(data):
     keys=['index','data','command']
-    print(data)
+
     for key in keys:
         if not key in data.keys():
             INVALID_DATA =True       
@@ -44,7 +45,7 @@ class UDPBroadcastReceiveServer():
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
         
-        response = response_handler(json.loads(data))
+        response = response_handler(data)
 
         time.sleep(3)
         self.printwt(f'[ RESPONSE to {client_address} ]')
@@ -92,7 +93,7 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         try:
             while True: # keep alive
                 try: # receive request from client
-                    data, client_address = self.sock.recvfrom(1024)
+                    data, client_address = self.sock.recvfrom(4096)
 
                     c_thread = threading.Thread(target = self.handle_request,
                                             args = (data, client_address))
@@ -109,3 +110,5 @@ def broadcast_receive():
     udp = UDPServerMultiClient()
     udp.configure_server()
     udp.wait_for_client()
+
+
