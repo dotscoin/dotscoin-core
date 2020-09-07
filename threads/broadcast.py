@@ -27,10 +27,20 @@ def broadcast(data,host,port):
 #reciever 
 def reciever():
     context = zmq.Context()
-    zsocket = context.socket(zmq.REP)
-    zsocket.bind("tcp://127.0.0.1:5558")
+    z1socket = context.socket(zmq.REP)
+    z1socket.bind("tcp://127.0.0.1:5558")
     while True:
         # print("r")
-        data = json.loads(zsocket.recv_string())
+        data = json.loads(z1socket.recv_string())
         print(data)
-        zsocket.send_string("recieved")
+        z1socket.send_string("recieved")
+
+# def vote_broadcast():
+#     context = zmq.Context()
+#     z2socket = context.socket(zmq.REP)
+#     z2socket.bind("tcp://127.0.0.1:5008")
+#     this_node_addr = "dgyuigy97ybvhvoi"
+#     while True:
+#         vote_to = z2socket.recv_string()
+#         print(vote_to)
+#         z2socket.send_string("vote recieved and broadcasting")
