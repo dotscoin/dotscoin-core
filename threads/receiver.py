@@ -4,22 +4,26 @@ from datetime import datetime
 import socket
 import threading
 import requests
+import json
 host = '0.0.0.0'
 port = 6040
-def get_nodes():
-    base_url="http://dns.dotscoin.com/get_nodes/"
-    nodes = requests.get(base_url)
-    print(nodes)
-    print(nodes.json()['nodes'])
-
-get_nodes()
-
+sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+sock.bind((host,port))
+INVALID_DATA=False
+def response_handler(data):
+    keys=['index','data','command']
+    print(data)
+    for key in keys:
+        if not key in data.keys():
+            INVALID_DATA =True       
+    if INVALID_DATA:
+        response = {
+        "error":"invaid type of data"
+        }
+        return json.dumps(response)
+    
 class UDPBroadcastReceiveServer():
-    def __init__(self, host, port):
-
-        self.host = host    # Host address
-        self.port = port    # Host port
-        self.sock = None    # Socket
+    sock=sock    # Socket
     def printwt(self, msg):
 
         ''' Print message with current date and time '''
@@ -28,42 +32,29 @@ class UDPBroadcastReceiveServer():
     def configure_server(self):
         self.printwt('Creating socket...')
         self.printwt('Socket created')
-        # bind server to the address
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind((host,port))
-        self.printwt(f'Binding server to {self.host}:{self.port}...')
-        self.printwt(f' Broadcasting and Receiving Server binded to {self.host}:{self.port}')
-    def get_phone_no(self, name):
-
-        ''' Get phone no for a given name '''
-        phonebook = {'Alex': '1234567890', 'Bob': '1234512345'}
-        if name in phonebook.keys():
-            return f"{name}'s phone number is {phonebook[name]}"
-
-
-        else:
-            return f"No records found for {name}"
+        self.printwt(f'Binding server to {host}:{port}...')
+        self.printwt(f' Broadcasting and Receiving Server binded to {host}:{port}')
+   
     def handle_request(self, data, client_address):
 
         ''' Handle the client '''
         # handle request
 
-        name = data.decode('utf-8')
+        data= data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
-        print('\n', name, '\n')
-        # send response to the client
-        resp = self.get_phone_no(name)
+        print('\n', data, '\n')
+        
+        response = response_handler(json.loads(data))
 
         time.sleep(3)
         self.printwt(f'[ RESPONSE to {client_address} ]')
-        self.sock.sendto(resp.encode('utf-8'), client_address)
-        print('\n', resp, '\n')
+        self.sock.sendto(response.encode('utf-8'), client_address)
+        print('\n', response, '\n')
     def wait_for_client(self):
 
         ''' Wait for a client '''
         try:
             # receive message from a client
-
             data, client_address = self.sock.recvfrom(1024)
             # handle client's request
 
@@ -80,29 +71,26 @@ class UDPBroadcastReceiveServer():
 class UDPServerMultiClient(UDPBroadcastReceiveServer):
     ''' A simple UDP Server for handling multiple clients '''
 
-    def __init__(self, host, port):
-        super().__init__(host, port)
+    def __init__(self):
         self.socket_lock = threading.Lock()
     
     def handle_request(self, data, client_address):
         # handle request
-        name = data.decode('utf-8')
-        resp = self.get_phone_no(name)
+        data= data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
-        print('\n', name, '\n')
-
+        print('\n', data, '\n')
+        
+        response = response_handler(json.loads(data))
         # send response to the client
         self.printwt(f'[ RESPONSE to {client_address} ]')
         with self.socket_lock:
-            self.sock.sendto(resp.encode('utf-8'), client_address)
-        print('\n', resp, '\n')
+            self.sock.sendto(response.encode('utf-8'), client_address)
+        print('\n', response, '\n')
 
     def wait_for_client(self):
         ''' Wait for clients and handle their requests '''
-
         try:
             while True: # keep alive
-
                 try: # receive request from client
                     data, client_address = self.sock.recvfrom(1024)
 
@@ -118,6 +106,6 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
             self.shutdown_server()
 
 def broadcast_receive():
-    udp = UDPServerMultiClient(host,port)
+    udp = UDPServerMultiClient()
     udp.configure_server()
     udp.wait_for_client()
