@@ -15,7 +15,8 @@ sock.bind((host,port))
 INVALID_DATA=False
 
 def response_handler(data):
-    keys=['index','data','command']
+    keys=['data','command']
+    INVALID_DATA =False
 
     for key in keys:
         if not key in data.keys():
@@ -31,6 +32,10 @@ def response_handler(data):
             mempool = Mempool()
             tx.from_json(data['data'])
             mempool.add_transaction(tx)
+        response = {
+        "message":"ok"
+        }
+        return json.dumps(response)
     
 class UDPBroadcastReceiveServer():
     sock=sock    # Socket
@@ -74,7 +79,7 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         data = data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
-        
+        print("hi")
         response = response_handler(json.loads(data))
 
         # send response to the client
@@ -89,7 +94,6 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
             while True: # keep alive
                 try: # receive request from client
                     data, client_address = self.sock.recvfrom(4096)
-
                     c_thread = threading.Thread(target = self.handle_request,
                                             args = (data, client_address))
                     c_thread.daemon = True

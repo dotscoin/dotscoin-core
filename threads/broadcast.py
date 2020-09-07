@@ -21,12 +21,14 @@ def get_nodes():
 udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 udpsock.bind((host,port))
 
-def broadcast(data,host,port):
-    nodes= get_nodes()
-    print(nodes)
-    for node in nodes:
-      add=node['addr'].split(":")
-      udpsock.sendto(data.encode('utf-8'),(add[0],int(add[1])))
+def broadcast(data):
+    # nodes= get_nodes()
+    # print(nodes)
+    # for node in nodes:
+    #   add=node['addr'].split(":")
+    #   udpsock.sendto(json.dumps(data).encode('utf-8'),(add[0],int(add[1])))
+    #   print("broadcast")
+    udpsock.sendto(json.dumps(data).encode('utf-8'),('127.0.0.1', 7000))
 
 
 #reciever 
@@ -35,9 +37,9 @@ def reciever():
     z1socket = context.socket(zmq.REP)
     z1socket.bind("tcp://127.0.0.1:5558")
     while True:
-        # print("r")
         data = json.loads(z1socket.recv_string())
-        print(data)
+        print("to broadcast")
+        broadcast(data)
         z1socket.send_string("recieved")
 
 # def vote_broadcast():

@@ -1,14 +1,14 @@
 from typing import Any
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 import hashlib
-from dotscoin.BlockChain import BlockChain
 import json
+import redis
 
 class Address:
     def __init__(self):
         self.sk = SigningKey.generate()
         self.vk = self.sk.verifying_key
-        self.redis_client = self.blockchain.redis_client
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def load(self, sk, vk) -> None:
         """ Loads Signing Key and Verifying key from external source."""

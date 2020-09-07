@@ -5,10 +5,19 @@ class TransactionInput:
     verifying_key = []
     
     def to_json(self):
-        data={
+        return {
             "hash":self.previous_tx,
             "index":self.index,
-            "script": self.scriptSig,
-            "verifyingKey": self.verifying_key
+            "scriptSig": self.scriptSig,
+            "verifying_key": self.verifying_key
         }
-        return data
+
+    @staticmethod
+    def from_json(data):
+        tmp = TransactionInput()
+        tmp.previous_tx = data['previous_tx']
+        tmp.index = data['index']
+        tmp.scriptSig = data['scriptSig']
+        tmp.verifying_key = data['verifying_key']
+
+        return tmp

@@ -19,10 +19,11 @@ from dotscoin.Mempool import Mempool
 
 def response_handler(data):
     keys=['data','command']
+    INVALID_DATA = False
 
     for key in keys:
         if not key in data.keys():
-            INVALID_DATA =True       
+            INVALID_DATA = True       
     if INVALID_DATA:
         response = {
         "error":"invaid type of data"

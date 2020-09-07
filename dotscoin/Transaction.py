@@ -6,6 +6,7 @@ from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
 from typing import List
 from dotscoin.Address import Address
+
 class TransactionStatus(str, Enum):
     UNCONFIRMED = "Unconfirmed"
     CONFIRMED = "Confirmed"
@@ -25,13 +26,13 @@ class Transaction:
         self.outputs.append(address)
 
     def from_json(self, data):
-        timestamp = data['timestamp']
-        version = data['version']
-        hash = data['hash']
-        inputs = [TransactionInput.from_json(input) for input in data['inputs']]
-        outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
-        is_coinbase = data['is_coinbase']
-        block = data['block']
+        self.timestamp = data['timestamp']
+        self.version = data['version']
+        self.hash = data['hash']
+        self.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
+        self.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
+        self.is_coinbase = data['is_coinbase']
+        self.block = data['block']
 
     def to_json(self):
         return {
