@@ -24,6 +24,26 @@ class Transaction:
     def add_output(self, address):
         self.outputs.append(address)
 
+    def from_json(self, data):
+        timestamp = data['timestamp']
+        version = data['version']
+        hash = data['hash']
+        inputs = [TransactionInput.from_json(input) for input in data['inputs']]
+        outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
+        is_coinbase = data['is_coinbase']
+        block = data['block']
+
+    def to_json(self):
+        return {
+            'timestamp': self.timestamp,
+            'version': self.version,
+            'hash': self.hash,
+            'inputs': [TransactionInput.to_json(input) for input in self.inputs],
+            'outputs': [TransactionOutput.to_json(output) for output in self.outputs],
+            'is_coinbase': self.is_coinbase,
+            'block': self.block
+        }
+
     def generate_hash(self):
         message = {
             'timestamp': datetime.timestamp(self.timestamp),
@@ -33,16 +53,6 @@ class Transaction:
         }
 
         self.hash = hashlib.sha256(str(message).encode()).hexdigest()
-
-    def display(self):
-        message = {
-            'timestamp': datetime.timestamp(self.timestamp),
-            'version': self.version,
-            'input': str(self.inputs),
-            'output': str(self.outputs)
-        }
-
-        return str(message)
 
     def generate_signature(self, sk):
         self.signature = sk.sign(self.display().encode("utf-8")).hex()
@@ -57,38 +67,12 @@ class Transaction:
     def broadcast_transaction(self):
         input_tx = [ input.to_json() for input in self.inputs]
         output_tx= [ output.to_json() for output in self.outputs]
-        message = {
-            'timestamp': datetime.timestamp(self.timestamp),
-            'version': self.version,
-            'inputs': input_tx,
-            'outputs': output_tx,
-            'hash': self.hash,
-            'block':self.block
-        }
+        message = self.to_json()
         return message
 
     def coinbase_transaction(self):
         if self.is_coinbase == True:
             self.input = []
-
-    def check_transaction(self):
-        if not isinstance(self.timestamp,datetime.datetime):
-            return False
-        if not isinstance(self.version, str):
-            return False
-        if not isinstance(self.hash , str):
-            return False
-        if not isinstance(self.input,List[TransactionInput]):
-            return False
-        if not isinstance(self.output,List[TransactionOutput]):
-            return False
-        if not isinstance(self.signature,str):
-            return False
-        if not isinstance(self.status,TransactionStatus):
-            return False
-        if not isinstance(self.fees,int):
-            return False
-        return True
 
     def verify_transaction(self):
         for i,input in enumerate(self.input):

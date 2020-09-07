@@ -16,13 +16,18 @@ def get_nodes():
     base_url="http://dns.dotscoin.com/get_nodes/"
     nodes = requests.get(base_url)
     print(nodes)
-    print(nodes.json()['nodes'])
+    return nodes.json()['nodes']
 
 udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 udpsock.bind((host,port))
 
 def broadcast(data,host,port):
-    udpsock.sendto(data.encode('utf-8'),(host,port))
+    nodes= get_nodes()
+    print(nodes)
+    for node in nodes:
+      add=node['addr'].split(":")
+      udpsock.sendto(data.encode('utf-8'),(add[0],int(add[1])))
+
 
 #reciever 
 def reciever():

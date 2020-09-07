@@ -1,7 +1,7 @@
 from queue import LifoQueue
 from dotscoin.Transaction import Transaction
 import redis
-
+import json
 
 class Mempool:
     """ This class stores all the transactions in a temporary cache memory for block generation. """
@@ -19,7 +19,7 @@ class Mempool:
         Returns:
             boolean: A boolean result to show if the transaction is added successfully or not.
         """
-        self.redis_client.rpush("mempool", val.display())
+        self.redis_client.rpush("mempool", json.dumps(val.to_json()))
         return True
 
     def get_transaction(self) -> Transaction:

@@ -5,14 +5,18 @@ import socket
 import threading
 import requests
 import json
+from dotscoin.Transaction import Transaction
+from dotscoin.Mempool import Mempool
+
 host = '0.0.0.0'
-port = 6040
+port = 7000
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind((host,port))
 INVALID_DATA=False
+
 def response_handler(data):
     keys=['index','data','command']
-    print(data)
+
     for key in keys:
         if not key in data.keys():
             INVALID_DATA =True       
@@ -21,6 +25,12 @@ def response_handler(data):
         "error":"invaid type of data"
         }
         return json.dumps(response)
+    else:
+        if data['command'] == "addtransaction":
+            tx = Transaction()
+            mempool = Mempool()
+            tx.from_json(data['data'])
+            mempool.add_transaction(tx)
     
 class UDPBroadcastReceiveServer():
     sock=sock    # Socket
@@ -35,23 +45,8 @@ class UDPBroadcastReceiveServer():
         self.printwt(f'Binding server to {host}:{port}...')
         self.printwt(f' Broadcasting and Receiving Server binded to {host}:{port}')
    
-    def handle_request(self, data, client_address):
-
-        ''' Handle the client '''
-        # handle request
-
-        data= data.decode('utf-8')
-        self.printwt(f'[ REQUEST from {client_address} ]')
-        print('\n', data, '\n')
         
-        response = response_handler(json.loads(data))
-
-        time.sleep(3)
-        self.printwt(f'[ RESPONSE to {client_address} ]')
-        self.sock.sendto(response.encode('utf-8'), client_address)
-        print('\n', response, '\n')
     def wait_for_client(self):
-
         ''' Wait for a client '''
         try:
             # receive message from a client
@@ -76,49 +71,39 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
     
     def handle_request(self, data, client_address):
         # handle request
-        data= data.decode('utf-8')
+        data = data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
         
         response = response_handler(json.loads(data))
+
         # send response to the client
         self.printwt(f'[ RESPONSE to {client_address} ]')
         with self.socket_lock:
             self.sock.sendto(response.encode('utf-8'), client_address)
         print('\n', response, '\n')
 
-    # def zmq_receiver(self):
-    #     print('zmq function')
-    #     if socke.recv_string(): 
-    #         receive_data=json.loads(socke.recv_string())
-    #         print('zmq function')
-    #         print(receive_data)
+    def wait_for_client(self):
+        ''' Wait for clients and handle their requests '''
+        try:
+            while True: # keep alive
+                try: # receive request from client
+                    data, client_address = self.sock.recvfrom(4096)
 
-    # def wait_for_client(self):
-    #     ''' Wait for clients and handle their requests '''
-    #     try:
-    #         while True: # keep alive
-    #             try: # receive request from client
-    #                 # z_mq_thread=threading.Thread(target=self.zmq_receiver)
-    #                 # z_mq_thread.start()
-    #                 # # data, client_address = self.sock.recvfrom(1024)
-    #                 # print("here")
-    #                 # z_mq_thread=threading.Thread(target=self.zmq_receiver)
-    #                 # z_mq_thread.start()
-    #                 # c_thread = threading.Thread(target = self.handle_request,
-    #                 #                         args = (data, client_address))
-    #                 # c_thread.daemon = True
-    #                 # c_thread.start()
+                    c_thread = threading.Thread(target = self.handle_request,
+                                            args = (data, client_address))
+                    c_thread.daemon = True
+                    c_thread.start()
 
+                except OSError as err:
+                    self.printwt(err)
 
-
-    #             except OSError as err:
-    #                 self.printwt(err)
-
-    #     except KeyboardInterrupt:
-    #         self.shutdown_server()
+        except KeyboardInterrupt:
+            self.shutdown_server()
 
 def broadcast_receive():
     udp = UDPServerMultiClient()
     udp.configure_server()
     udp.wait_for_client()
+
+
