@@ -15,10 +15,6 @@ import wsgiserver
 host = '0.0.0.0'
 port = 7000
 
-context = zmq.Context()
-socke = context.socket(zmq.REQ)
-socke.connect("tcp://127.0.0.2:5555")
-
 @get('/')
 def listening_handler():
     '''Handles name creation'''
@@ -28,12 +24,17 @@ def listening_handler():
           
 @post('/')
 def posting_handler():
+    context = zmq.Context()
+    zsocket = context.socket(zmq.REQ)
+    zsocket.connect("tcp://127.0.0.1:5558")
     body=request.json
-    socke.send_string(json.dumps(body))
+    zsocket.send_string(json.dumps(body))
+    message = zsocket.recv()
+    zsocket.close()
     return {"status":"ok"}
     
 def rpc_receive():
     wsgiapp = bottle.default_app()
     httpd = wsgiserver.Server(wsgiapp)
-    httpd.serve_forever()  
+    httpd.serve_forever()
 
