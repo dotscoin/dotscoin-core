@@ -1,11 +1,14 @@
 from typing import Any
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 import hashlib
+from dotscoin.BlockChain import BlockChain
+import json
 
 class Address:
     def __init__(self):
         self.sk = SigningKey.generate()
         self.vk = self.sk.verifying_key
+        self.redis_client = self.blockchain.redis_client
 
     def load(self, sk, vk) -> None:
         """ Loads Signing Key and Verifying key from external source."""
@@ -38,3 +41,23 @@ class Address:
             'vk': self.vk.to_pem().decode("utf-8"),
             'sk': self.sk.to_pem().decode("utf-8")
         }
+
+    def total_value(self, addr):
+        i = 1
+        total = 0
+        while True:
+            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            if block == None:
+                return total
+            for tx in block.txs:
+                for input in tx.inputs:
+                    if input.address == addr:
+                        total = total + input.value
+                for out in tx.outputs:
+                    if out.address == addr:
+                        total = total - out.value
+            i = i + 1
+        return total
+
+
+
