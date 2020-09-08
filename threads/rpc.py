@@ -32,11 +32,9 @@ def response_handler(data):
     else:
         if data['command'] == "addtransaction":
             #To mempool
-            tx = Transaction()
+            tx = Transaction.from_json(data['data'])
             mempool = Mempool()
-            tx.from_json(data['data'])
             mempool.add_transaction(tx)
-
             #To broadcast
             context = zmq.Context()
             zsocket = context.socket(zmq.REQ)
