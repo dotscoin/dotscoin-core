@@ -3,8 +3,7 @@ from dotscoin.Transaction import Transaction
 import hashlib
 from typing import List
 import json
-
-
+import sys
 class Block:
     def __init__(self, prev_block_hash: str):
         self.hash:str = ""
@@ -31,7 +30,21 @@ class Block:
             'version': self.version,
             'size': self.size
         }
-
+    def calcalute_block_size(self):
+        size = 0
+        message={
+            'hash': self.hash,
+            'timestamp': self.timestamp,
+            'transactions': [tx.to_json() for tx in self.transactions],
+            'previous_block_hash': self.previous_block_hash,
+            'merkle_root': self.merkle_root,
+            'height': self.height,
+            'version': self.version,
+            'size': self.size
+        }
+        for key in message.keys():
+            size += sys.getsizeof(message[key]) 
+        return size
     @staticmethod
     def from_json(data):
         tmp = Block()
