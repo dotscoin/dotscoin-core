@@ -43,12 +43,22 @@ def reciever():
         z1socket.send_string("recieved")
 
 
-# def vote_broadcast():
-#     context = zmq.Context()
-#     z2socket = context.socket(zmq.REP)
-#     z2socket.bind("tcp://127.0.0.1:5008")
-#     this_node_addr = "dgyuigy97ybvhvoi"
-#     while True:
-#         vote_to = z2socket.recv_string()
-#         print(vote_to)
-#         z2socket.send_string("vote recieved and broadcasting")
+def vote_broadcast():
+    context = zmq.Context()
+    z2socket = context.socket(zmq.REP)
+    z2socket.bind("tcp://127.0.0.1:5008")
+    this_node_addr = "dgyuigy97ybvhvoi"
+    while True:
+        vote_to = json.loads(z2socket.recv_string())
+        print(vote_to)
+        z2socket.send_string("vote recieved and broadcasting")
+        broadcast(vote_to)
+
+def block_cast():
+    context = zmq.Context()
+    z4socket = context.socket(zmq.REP)
+    z4socket.bind("tcp://127.0.0.1:5007")
+    while True:
+        block = json.loads(z4socket.recv_string())
+        z4socket.send_string("block recieved and broadcasting")
+        broadcast(block)

@@ -82,10 +82,13 @@ class Election:
         context = zmq.Context()
         z2socket = context.socket(zmq.REQ)
         z2socket.connect("tcp://127.0.0.1:5008")
-        z2socket.send_string(select)
+        z2socket.send_string(json.dumps({"voter_addr":self.this_node_addr, "voted_addr":select}))
         message = z2socket.recv()
         z2socket.close()
         return 
+
+    def add_vote(self, vote):
+        self.votes.update(vote)
 
     def delegates(self):
         votes_count = defaultdict(int)
@@ -99,64 +102,129 @@ class Election:
             dels = list(reversed(list(votes_count)))
         return dels
 
+    # def run_election(self):
+    #     self.get_stakes()
+    #     self.vote_to()
+    #     self.get_vote()
+    #     dels = self.delegates()
 
-    def run_election(self):
-        self.get_stakes()
-        self.vote_to()
-        self.get_vote()
-        dels = self.delegates()
+    #     for dele in dels:
+    #         if dele == self.this_node_addr:
+    #             blk = Block()
+    #             for i in range(0,20):
+    #                 tx = self.redis_client.lindex('mempool', i).decode('utf-8')
+    #                 if tx == None:
+    #                     break
+    #                 verify_verdict = self.verification.verify_tx(tx)
+    #                 if verify_verdict == "verified":
+    #                     #map to blk/create block
+    #                     blk.add_transaction(tx)
+    #                 else:
+    #                     i =  i - 1
+    #                     continue
+    #             #add block
+    #             blkChain = blockchain()
+    #             blkChain.add_block(blk)
 
-        for dele in dels:
-            if dele == self.this_node_addr:
-                blk = Block()
-                for i in range(0,20):
-                    tx = self.redis_client.lindex('mempool', i).decode('utf-8')
-                    if tx == None:
-                        break
-                    verify_verdict = self.verification.verify_tx(tx)
-                    if verify_verdict == "verified":
-                        #map to blk/create block
-                        blk.add_transaction(tx)
-                    else:
-                        i =  i - 1
-                        continue
-                #add block
-                blkChain = blockchain()
-                blkChain.add_block(blk)
-
-                #full blockchain verify
-                full_verify_message = self.verification.full_chain_verify()
-                if full_verify_message == "verified": 
-                    pass
-                else:
-                    return
+    #             #full blockchain verify
+    #             full_verify_message = self.verification.full_chain_verify()
+    #             if full_verify_message == "verified": 
+    #                 pass
+    #             else:
+    #                 return
 
 def worker():
+    Election.election_fund()
+    Election.get_stakes()
+    Election.vote_to()
     context = zmq.Context()
     zsocket = context.socket(zmq.REP)
     zsocket.bind("tcp://127.0.0.1:5009")
     zpoll = zmq.Poller()
     zpoll.register(zsocket)
     start_timestamp = time.time()
-    while time.time() - start_timestamp < 15:
+    while time.time() - start_timestamp < 14:
         events = dict(zpoll.poll(1))
         for key in events:
-            print(key.recv_string())
+            vote = json.loads(key.recv_string())
+            print(vote)
+            Election.add_vote(vote)
             zsocket.send_string("got some nodes vote")
     zpoll.unregister(zsocket)
     zsocket.close()
     context.destroy()
+    return Election.delegates()
+
+def mining():
+    dels = worker()
+    is_del = False
+    for dele in dels:
+        if dele == Election.this_node_addr:
+            is_del = True
+            blk = Block()
+            for i in range(0,20):
+                tx = Election.redis_client.lindex('mempool', i).decode('utf-8')
+                if tx == None:
+                    break
+                verify_verdict = Election.verification.verify_tx(tx)
+                if verify_verdict == "verified":
+                    #Sending data to block
+                    blk.add_transaction(tx)
+                else:
+                    i =  i - 1
+                    continue
+            #create block
+            Block.compute_hash()
+            Block.calculate_merkle_root()
+            block = Block.to_json()
+            
+            #add block
+            blkChain = BlockChain()
+            blkChain.add_block(block)
+
+            #full blockchain verify
+            full_verify_message = Election.verification.full_chain_verify()
+            if full_verify_message == "verified": 
+                #braodcast the block you made
+                context = zmq.Context()
+                z4socket = context.socket(zmq.REQ)
+                z4socket.connect("tcp://127.0.0.1:5007")
+                z4socket.send_string(json.dumps(block))
+                message = z4socket.recv()
+                z4socket.close()
+            else:
+                return
+    if is_del == False :
+        full_verify_message = Election.verification.full_chain_verify()
+
+def add_block_nondel():
+    context = zmq.Context()
+    zsocket = context.socket(zmq.REP)
+    zsocket.bind("tcp://127.0.0.1:5119")
+    zpoll = zmq.Poller()
+    zpoll.register(zsocket)
+    start_timestamp = time.time()
+    all_blocks = []
+    while time.time() - start_timestamp < 1:
+        events = dict(zpoll.poll(1))
+        for key in events:
+            block = json.loads(key.recv_string())
+            print(block)
+            all_blocks.append(block)
+            zsocket.send_string("got some block")
+    zpoll.unregister(zsocket)
+    zsocket.close()
+    context.destroy()
+    #get most common and add to chain
+    
+    #run full blockchain verif
 
 def run_thread():
-    t = threading.Thread(target=worker)
+    t = threading.Thread(target=mining)
     t.start()
-    t.join(2)
-    ctx = zmq.Context()
-    z2socket = ctx.socket(zmq.REQ)
-    z2socket.connect("tcp://127.0.0.1:5009")
-    z2socket.send_string("Fuck you")
-    message = z2socket.recv()
-    z2socket.close()
-    ctx.destroy()
+    t.join()
+    t = threading.Thread(target=add_block_nondel)
+    t.start()
+    t.join()
 
 

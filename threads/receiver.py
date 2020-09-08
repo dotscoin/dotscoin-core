@@ -8,6 +8,7 @@ import json
 import zmq
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
+from dotscoin.Block import Block
 
 host = '0.0.0.0'
 port = 7000
@@ -36,10 +37,18 @@ def response_handler(data):
             context = zmq.Context()
             z3socket = context.socket(zmq.REQ)
             z3socket.connect("tcp://127.0.0.1:5009")
-            z3socket.send_string(data['data'])
+            z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
             z3socket.close()
-            
+            context.destroy()
+        elif data['command'] == "addblock":
+            context = zmq.Context()
+            z3socket = context.socket(zmq.REQ)
+            z3socket.connect("tcp://127.0.0.1:5119")
+            z3socket.send_string(json.dumps(data['data']))
+            message = z3socket.recv()
+            z3socket.close()
+            context.destroy()
         response = {
         "message":"ok"
         }

@@ -53,13 +53,8 @@ class BlockChain:
             'fee': 0
         }
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
-<<<<<<< HEAD
         
     def add_block(self, blk):
-=======
-
-    def add_block(self):
->>>>>>> 59218119645d3aa2db88cdf44c9f4bf175fc021a
         # print(json.dumps(self.block))
         self.redis_client.rpush('chain', json.dumps(blk))
 
