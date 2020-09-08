@@ -8,6 +8,7 @@ from collections import defaultdict
 import random
 import zmq
 import time
+import threading
 
 class Election:
     """
@@ -86,22 +87,6 @@ class Election:
         z2socket.close()
         return 
 
-    def get_vote(self):
-        #recieve the vote of other nodes
-        context = zmq.Context()
-        z3socket = context.socket(zmq.REP)
-        z3socket.bind("tcp://127.0.0.1:5009")
-        while True:
-            vote_data = json.loads(z3socket.recv_string())
-            voter_addr = vote_data.addr
-            voted_addr = vote_data.select
-            z3socket.send_string("got some nodes vote")
-            for key, val in self.votes.items():
-                if key == voter_addr:
-                    return
-            self.votes.update({voter_addr, voted_addr})
-        return
-
     def delegates(self):
         votes_count = defaultdict(int)
         for key, val in self.votes.items():
@@ -142,21 +127,36 @@ class Election:
                 #full blockchain verify
                 full_verify_message = self.verification.full_chain_verify()
                 if full_verify_message == "verified": 
-                    #do something 
+                    pass
                 else:
                     return
 
+def worker():
+    context = zmq.Context()
+    zsocket = context.socket(zmq.REP)
+    zsocket.bind("tcp://127.0.0.1:5009")
+    zpoll = zmq.Poller()
+    zpoll.register(zsocket)
+    start_timestamp = time.time()
+    while time.time() - start_timestamp < 15:
+        events = dict(zpoll.poll(1))
+        for key in events:
+            print(key.recv_string())
+            zsocket.send_string("got some nodes vote")
+    zpoll.unregister(zsocket)
+    zsocket.close()
+    context.destroy()
 
-
-
-
-
-
-
-
-
-
-
-
+def run_thread():
+    t = threading.Thread(target=worker)
+    t.start()
+    t.join(2)
+    ctx = zmq.Context()
+    z2socket = ctx.socket(zmq.REQ)
+    z2socket.connect("tcp://127.0.0.1:5009")
+    z2socket.send_string("Fuck you")
+    message = z2socket.recv()
+    z2socket.close()
+    ctx.destroy()
 
 

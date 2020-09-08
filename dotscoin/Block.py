@@ -2,6 +2,7 @@ from datetime import datetime
 from dotscoin.Transaction import Transaction
 import hashlib
 from typing import List
+import json
 
 
 class Block:
@@ -11,7 +12,6 @@ class Block:
         self.transactions: List[Transaction] = []
         self.previous_block_hash = prev_block_hash
         self.merkle_root: str = ""
-        self.confirmation = 0
         self.height =0
         self.version:str = "0.0.1"
         self.size = 0
@@ -27,7 +27,6 @@ class Block:
             'transactions': [tx.to_json() for tx in self.transactions],
             'previous_block_hash': self.previous_block_hash,
             'merkle_root': self.merkle_root,
-            'confirmation': self.confirmation,
             'height': self.height,
             'version': self.version,
             'size': self.size
@@ -42,7 +41,6 @@ class Block:
         tmp.transactions = [Transaction.from_json(tx) for tx in data['transactions']]
         tmp.previous_block_hash = data['previous_block_hash']
         tmp.merkle_root = data['merkle_root']
-        tmp.confirmation = data['confirmation']
         tmp.height = data['height']
         tmp.version = data['version']
         tmp.size = data['size']
@@ -51,15 +49,16 @@ class Block:
 
     def compute_hash(self):
         message={
-            "timestamp": datetime.timestamp(self.timestamp),
-            "transactions": self.transactions,
+            "timestamp": self.timestamp,
+            "transactions": [tx.to_json() for tx in self.transactions],
             "previous_block_hash":self.previous_block_hash,
+            "merkle_root":self.merkle_root,
             "height":self.height,
             "version":self.version,
-            "merkle_root":self.merkle_root
+            "size": self.size
         }
     
-        self.hash= hashlib.sha256(str(message).encode()).hexdigest()
+        self.hash= hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
 
     def calculate_merkle_root(self, transactions=[]):
         new_tran = []
