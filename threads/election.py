@@ -50,15 +50,18 @@ class Election:
         #     self.redis_client.hmset('fund '+self.fund_addr, {"test234": self.redis_client.hincrby('fund '+self.fund_addr, "test234", 3463)})
 
         # print(self.redis_client.hget('fund '+self.fund_addr, "test23"))
-        i = 1
-        while True:
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+        chain_length = self.redis_client.llen('chain')
+        i = 0
+        while i < chain_length:
+            raw = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            print(raw)
+            block = Block.from_json(raw)
             if block == None:
                 return 
-            for tx in block.txs:
+            for tx in block.transactions:
                 for out in tx.outputs:
-                    if out.addr == self.fund_addr:
-                        sender_addr = tx.inputs[0].addr
+                    if out.address == self.fund_addr:
+                        sender_addr = tx.inputs[0].address
                         if self.redis_client.hget('fund '+self.fund_addr, sender_addr) == None:
                             self.redis_client.hmset('fund '+self.fund_addr, {sender_addr: out.value})
                         else:
@@ -67,7 +70,7 @@ class Election:
         return 
 
     def get_stakes(self):
-        # self.election_fund()
+        self.election_fund()
         fetch_stakes_bytes = self.redis_client.hgetall('fund '+self.fund_addr)
         fetch_stakes = { y.decode('ascii'): fetch_stakes_bytes.get(y).decode('ascii') for y in fetch_stakes_bytes.keys() }
         print(fetch_stakes)
@@ -80,6 +83,8 @@ class Election:
             total_stake += int(val)
             for i in range(0, int(val)):
                 arr.append(key)
+        if total_stake == 0:
+            return
         select = arr[random.randint(0, total_stake-1)]
         while select == self.this_node_addr:
             select = arr[random.randint(0, total_stake - 1)]
@@ -191,6 +196,8 @@ def electionworker():
     for dele in dels:
         if dele == elec.this_node_addr:
             is_del = True
+            if elec.redis_client.llen("mempool") == 0:
+                return
             blk = Block()
             for i in range(0, elec.redis_client.llen("mempool")):
                 tx = elec.redis_client.lindex('mempool', i).decode('utf-8')
@@ -200,6 +207,7 @@ def electionworker():
                 if verify_verdict == "verified":
                     #Sending data to block
                     blk.add_transaction(tx)
+            
             #create block
             blk.compute_hash()
             blk.calculate_merkle_root()

@@ -27,7 +27,7 @@ def broadcast(data):
     #   add=node['addr'].split(":")
     #   udpsock.sendto(json.dumps(data).encode('utf-8'),(add[0],int(add[1])))
     #   print("broadcast")
-    udpsock.sendto(json.dumps(data).encode('utf-8'),('127.0.0.1', 7000))
+    udpsock.sendto(json.dumps(data).encode('utf-8'),('127.0.0.1', settings.UDP_RECEIVER_PORT))
 
 
 #reciever 
@@ -38,6 +38,5 @@ def reciever():
     z1socket.bind("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
     while True:
         data = json.loads(z1socket.recv_string())
-        print("to broadcast")
         broadcast(data)
         z1socket.send_string("recieved")

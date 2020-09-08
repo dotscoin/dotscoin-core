@@ -30,6 +30,7 @@ def response_handler(data):
         }
         return json.dumps(response)
     else:
+        print(data)
         if data['command'] == "addtransaction":
             tx = Transaction.from_json(data['data'])
             mempool = Mempool()

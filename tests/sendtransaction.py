@@ -1,9 +1,10 @@
 import requests
 import json
+import time
 
 if __name__ == '__main__':
     tx = {
-        'timestamp': 1599401715.846347,
+        'timestamp': time.time(),
         'version': '0.0.2',
         'inputs': [
             {

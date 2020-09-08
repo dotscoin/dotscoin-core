@@ -17,14 +17,13 @@ class Transaction:
     hash: str = ""
     inputs: List[TransactionInput] = []
     outputs: List[TransactionOutput] = []
-    is_coinbase: bool = False
     block = "Mempool"
     
-    def add_input(self, transaction):
-        self.inputs.append(transaction)
+    def add_input(self, ti: TransactionInput):
+        self.inputs.append(ti)
 
-    def add_output(self, address):
-        self.outputs.append(address)
+    def add_output(self, to: TransactionOutput):
+        self.outputs.append(to)
 
     @staticmethod
     def from_json(data):
@@ -34,7 +33,6 @@ class Transaction:
         tmp.hash = data['hash']
         tmp.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
         tmp.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
-        tmp.is_coinbase = data['is_coinbase']
         tmp.block = data['block']
 
         return tmp
@@ -46,7 +44,6 @@ class Transaction:
             'hash': self.hash,
             'inputs': [TransactionInput.to_json(input) for input in self.inputs],
             'outputs': [TransactionOutput.to_json(output) for output in self.outputs],
-            'is_coinbase': self.is_coinbase,
             'block': self.block
         }
 
