@@ -61,6 +61,7 @@ def posting_handler():
     return {"status":"ok"}
     
 def rpc_receive():
+    print("Starting RPC Process")
     wsgiapp = bottle.default_app()
     httpd = wsgiserver.Server(wsgiapp)
     httpd.serve_forever()

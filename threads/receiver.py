@@ -123,6 +123,7 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
             self.shutdown_server()
 
 def broadcast_receive():
+    print("Starting Receiver Process")
     udp = UDPServerMultiClient()
     udp.configure_server()
     udp.wait_for_client()

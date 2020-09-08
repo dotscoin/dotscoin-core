@@ -19,15 +19,21 @@ class Verification:
             i = 0
             # block = json.loads(self.redis_client.lindex('chain', -1).decode('utf-8'))
             while True:
+                flag = 0
                 block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
                 if block == None:
                     tx_verdict = "verified"
                     return tx_verdict
                 for tx in block.txs:
-                    for out in tx.outs:
-                        if out.tx_index == input.prev_out.tx_index and out.hash == input.prev_out.hash :
-                            tx_verdict = "transaction rejected"
+                    if tx.hash == input.previous_tx:
+                        flag = 1
+                        continue
+                    for inp in tx.inputs:
+                        if input.previous_tx == inp.previous_tx and input.index == inp.index :
+                            tx_verdict = "rejected"
                             return tx_verdict
+                if flag == 1:
+                    break
                 i = i + 1
         
         tx_verdict = "verified"
@@ -46,7 +52,7 @@ class Verification:
 
     def full_chain_verify(self):
         verify_message = "unverified"
-        for i in range(0,self.chain_length):
+        for i in range(0, self.chain_length):
             block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
             v_merkl_root = self.block.calculate_merkle_root(block.txs)
             if v_merkl_root != block.merkle_root: 
@@ -56,11 +62,11 @@ class Verification:
         return verify_message
     
     def del_from_faultblock(self, fault_index):
-        self.redis_client.ltrim(0, fault_index-1)
+        self.redis_client.ltrim(fault_index, self.chain_length)
+        self.sync_chain()
 
     def sync_chain(self):
-        #sync from a node
-        return self
+        pass
 
 
 
