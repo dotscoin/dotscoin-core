@@ -7,12 +7,11 @@ import requests
 import zmq
 import json
 import urllib.request
+import settings
 
 host = '0.0.0.0'
-port = 6500
+port = settings.UDP_BROADCAST_PORT
 INVALID_DATA=False
-
-
 
 def get_nodes():
     response = urllib.request.urlopen("http://dns.dotscoin.com/get_nodes").read()
@@ -33,22 +32,12 @@ def broadcast(data):
 
 #reciever 
 def reciever():
+    print("Starting Broadcast Process")
     context = zmq.Context()
     z1socket = context.socket(zmq.REP)
-    z1socket.bind("tcp://127.0.0.1:5558")
+    z1socket.bind("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
     while True:
         data = json.loads(z1socket.recv_string())
         print("to broadcast")
         broadcast(data)
         z1socket.send_string("recieved")
-
-
-# def vote_broadcast():
-#     context = zmq.Context()
-#     z2socket = context.socket(zmq.REP)
-#     z2socket.bind("tcp://127.0.0.1:5008")
-#     this_node_addr = "dgyuigy97ybvhvoi"
-#     while True:
-#         vote_to = z2socket.recv_string()
-#         print(vote_to)
-#         z2socket.send_string("vote recieved and broadcasting")

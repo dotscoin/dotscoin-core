@@ -3,13 +3,6 @@ from datetime import datetime
 from numbers import Number
 from collections import Set, Mapping, deque
 
-try: # Python 2
-    zero_depth_bases = (basestring, Number, xrange, bytearray)
-    iteritems = 'iteritems'
-except NameError: # Python 3
-    zero_depth_bases = (str, bytes, Number, range, bytearray)
-    iteritems = 'items'
-
 def getsize(obj_0):
     """Recursively iterate to sum size of object & members."""
     _seen_ids = set()
@@ -32,3 +25,8 @@ def getsize(obj_0):
             size += sum(inner(getattr(obj, s)) for s in obj.__slots__ if hasattr(obj, s))
         return size
     return inner(obj_0)
+
+def getbytes(obj):
+    dic=obj.__dict__
+    size=sys.getsizeof(dic)
+    return size

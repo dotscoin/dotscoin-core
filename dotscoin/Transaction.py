@@ -1,4 +1,4 @@
-from datetime import datetime
+import time
 import hashlib
 from ecdsa import VerifyingKey, BadSignatureError
 from enum import Enum
@@ -12,7 +12,7 @@ class TransactionStatus(str, Enum):
     CONFIRMED = "Confirmed"
 
 class Transaction:
-    timestamp = datetime.now()
+    timestamp = time.time()
     version: str = "0.0.1"
     hash: str = ""
     inputs: List[TransactionInput] = []
@@ -52,7 +52,7 @@ class Transaction:
 
     def generate_hash(self):
         message = {
-            'timestamp': datetime.timestamp(self.timestamp),
+            'timestamp': self.timestamp,
             'version': self.version,
             'input': str(self.inputs),
             'output': str(self.outputs)
