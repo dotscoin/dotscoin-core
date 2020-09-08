@@ -19,20 +19,25 @@ class Transaction:
     outputs: List[TransactionOutput] = []
     is_coinbase: bool = False
     block = "Mempool"
+    
     def add_input(self, transaction):
         self.inputs.append(transaction)
 
     def add_output(self, address):
         self.outputs.append(address)
 
-    def from_json(self, data):
-        self.timestamp = data['timestamp']
-        self.version = data['version']
-        self.hash = data['hash']
-        self.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
-        self.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
-        self.is_coinbase = data['is_coinbase']
-        self.block = data['block']
+    @staticmethod
+    def from_json(data):
+        tmp = Transaction()
+        tmp.timestamp = data['timestamp']
+        tmp.version = data['version']
+        tmp.hash = data['hash']
+        tmp.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
+        tmp.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
+        tmp.is_coinbase = data['is_coinbase']
+        tmp.block = data['block']
+
+        return tmp
 
     def to_json(self):
         return {

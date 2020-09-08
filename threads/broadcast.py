@@ -6,6 +6,8 @@ import threading
 import requests
 import zmq
 import json
+import urllib.request
+
 host = '0.0.0.0'
 port = 6500
 INVALID_DATA=False
@@ -13,10 +15,8 @@ INVALID_DATA=False
 
 
 def get_nodes():
-    base_url="http://dns.dotscoin.com/get_nodes/"
-    nodes = requests.get(base_url)
-    print(nodes)
-    return nodes.json()['nodes']
+    response = urllib.request.urlopen("http://dns.dotscoin.com/get_nodes").read()
+    return json.loads(response)['nodes']
 
 udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 udpsock.bind((host,port))

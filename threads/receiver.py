@@ -29,9 +29,8 @@ def response_handler(data):
         return json.dumps(response)
     else:
         if data['command'] == "addtransaction":
-            tx = Transaction()
+            tx = Transaction.from_json(data['data'])
             mempool = Mempool()
-            tx.from_json(data['data'])
             mempool.add_transaction(tx)
         elif data['command'] == "voteto":
             context = zmq.Context()

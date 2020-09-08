@@ -13,15 +13,41 @@ class Block:
         self.merkle_root: str = ""
         self.confirmation = 0
         self.height =0
-        self.miner: str = ""
         self.version:str = "0.0.1"
         self.size = 0
-        self.block_reward = 50
-        self.fee = 0
 
     
     def add_transaction(self, transaction: Transaction):
         self.transactions.append(transaction)
+
+    def to_json(self):
+        return {
+            'hash': self.hash,
+            'timestamp': self.timestamp,
+            'transactions': [tx.to_json() for tx in self.transactions],
+            'previous_block_hash': self.previous_block_hash,
+            'merkle_root': self.merkle_root,
+            'confirmation': self.confirmation,
+            'height': self.height,
+            'version': self.version,
+            'size': self.size
+        }
+
+    @staticmethod
+    def from_json(data):
+        tmp = Block()
+
+        tmp.hash = data['hash']
+        tmp.timestamp = data['timestamp']
+        tmp.transactions = [Transaction.from_json(tx) for tx in data['transactions']]
+        tmp.previous_block_hash = data['previous_block_hash']
+        tmp.merkle_root = data['merkle_root']
+        tmp.confirmation = data['confirmation']
+        tmp.height = data['height']
+        tmp.version = data['version']
+        tmp.size = data['size']
+
+        return tmp
 
     def compute_hash(self):
         message={
