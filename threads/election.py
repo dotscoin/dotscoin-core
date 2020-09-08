@@ -73,7 +73,7 @@ class Election:
         self.election_fund()
         fetch_stakes_bytes = self.redis_client.hgetall('fund '+self.fund_addr)
         fetch_stakes = { y.decode('ascii'): fetch_stakes_bytes.get(y).decode('ascii') for y in fetch_stakes_bytes.keys() }
-        print(fetch_stakes)
+        # print(fetch_stakes)
         self.stakes = fetch_stakes
 
     def vote_to(self):
@@ -83,6 +83,7 @@ class Election:
             total_stake += int(val)
             for i in range(0, int(val)):
                 arr.append(key)
+        self.redis_client.hmset('fund '+self.fund_addr, {"total fund": total_stake})
         if total_stake == 0:
             return
         select = arr[random.randint(0, total_stake-1)]
@@ -192,11 +193,14 @@ def electionworker():
     elec = Election()
     elec.get_node_addr()
     dels = worker()
+    print("yes")
     is_del = False
     for dele in dels:
         if dele == elec.this_node_addr:
+            print("del")
             is_del = True
             if elec.redis_client.llen("mempool") == 0:
+                print("ha ye to ")
                 return
             blk = Block()
             for i in range(0, elec.redis_client.llen("mempool")):
@@ -252,13 +256,15 @@ def add_block_nondel():
     zsocket.close()
     context.destroy()
     #get most common and add to chain
-    mr = []
-    for blk in all_blocks:
-        mr.append(blk.merkle_root)
-    #run full blockchain verif
-    blkc = BlockChain()
-    Mblock = bestblock(mr)
-    blkc.add_block(Mblock)
+    if len(all_blocks) > 0:
+        print(all_blocks)
+        mr = []
+        for blk in all_blocks:
+            mr.append(blk.merkle_root)
+        #run full blockchain verif
+        blkc = BlockChain()
+        Mblock = bestblock(mr)
+        blkc.add_block(Mblock)
 
 def run_thread():
     print("Starting Election/Mining rocess")
