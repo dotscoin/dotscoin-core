@@ -2,7 +2,7 @@ from dotscoin.Address import Address
 from dotscoin.Transaction import Transaction
 from dotscoin.Block import Block
 from dotscoin.BlockChain import BlockChain
-from dotscoin.Election import Election
+from threads.Election import Election
 
 if __name__ == '__main__':
     address = Address()
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # # chain.add_block()
     # # chain.clear_chain()
     # print(chain.read_chain())
-    election.election_fund()
+    election.get_stakes()
 
 
 

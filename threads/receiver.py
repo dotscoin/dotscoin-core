@@ -5,6 +5,7 @@ import socket
 import threading
 import requests
 import json
+import zmq
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 
@@ -32,6 +33,14 @@ def response_handler(data):
             mempool = Mempool()
             tx.from_json(data['data'])
             mempool.add_transaction(tx)
+        elif data['command'] == "voteto":
+            context = zmq.Context()
+            z3socket = context.socket(zmq.REQ)
+            z3socket.connect("tcp://127.0.0.1:5009")
+            z3socket.send_string(data['data'])
+            message = z3socket.recv()
+            z3socket.close()
+            
         response = {
         "message":"ok"
         }

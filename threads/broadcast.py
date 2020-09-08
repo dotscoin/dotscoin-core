@@ -42,6 +42,7 @@ def reciever():
         broadcast(data)
         z1socket.send_string("recieved")
 
+
 # def vote_broadcast():
 #     context = zmq.Context()
 #     z2socket = context.socket(zmq.REP)
