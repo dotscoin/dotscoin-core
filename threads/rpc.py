@@ -9,11 +9,12 @@ import cgi
 import socketserver
 import threading
 import zmq
+import settings
 from bottle import route, run, template,get,post ,request,response
 import bottle
 import wsgiserver
 host = '0.0.0.0'
-port = 7000
+port = settings.RPC_PORT
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 
@@ -38,7 +39,7 @@ def response_handler(data):
             #To broadcast
             context = zmq.Context()
             zsocket = context.socket(zmq.REQ)
-            zsocket.connect("tcp://127.0.0.1:5558")
+            zsocket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
             zsocket.send_string(json.dumps(data))
             message = zsocket.recv()
             zsocket.close()

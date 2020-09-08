@@ -4,8 +4,7 @@ import redis
 import json
 
 class Verification:
-    def __init__(self, pending_block: any):
-        self.pblock = pending_block
+    def __init__(self):
         blockchain = BlockChain()
         self.block = Block()
         self.redis_client = blockchain.redis_client

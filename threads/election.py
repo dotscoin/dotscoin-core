@@ -11,6 +11,7 @@ import time
 import redis
 import threading
 import urllib.request
+import settings
 
 class Election:
     """
@@ -83,11 +84,11 @@ class Election:
         while select == self.this_node_addr:
             select = arr[random.randint(0, total_stake - 1)]
         # add your vote to this node's this election's votes array
-        self.votes.update({self.this_node_addr, select})
+        self.votes[self.this_node_addr] = select
         # Broadcast the selected node to vote
         context = zmq.Context()
         z2socket = context.socket(zmq.REQ)
-        z2socket.connect("tcp://127.0.0.1:5008")
+        z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
         z2socket.send_string(json.dumps({"voter_addr":self.this_node_addr, "voted_addr":select}))
         message = z2socket.recv()
         z2socket.close()
@@ -163,7 +164,7 @@ def worker():
     elec.vote_to()
     context = zmq.Context()
     zsocket = context.socket(zmq.REP)
-    zsocket.bind("tcp://127.0.0.1:5009")
+    zsocket.bind("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
     zpoll = zmq.Poller()
     zpoll.register(zsocket)
     start_timestamp = time.time()
@@ -214,7 +215,7 @@ def electionworker():
                 #braodcast the block you made
                 context = zmq.Context()
                 z4socket = context.socket(zmq.REQ)
-                z4socket.connect("tcp://127.0.0.1:5007")
+                z4socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
                 z4socket.send_string(json.dumps(block))
                 message = z4socket.recv()
                 z4socket.close()
@@ -227,7 +228,7 @@ def electionworker():
 def add_block_nondel():
     context = zmq.Context()
     zsocket = context.socket(zmq.REP)
-    zsocket.bind("tcp://127.0.0.1:5119")
+    zsocket.bind("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
     zpoll = zmq.Poller()
     zpoll.register(zsocket)
     start_timestamp = time.time()
@@ -247,8 +248,9 @@ def add_block_nondel():
     for blk in all_blocks:
         mr.append(blk.merkle_root)
     #run full blockchain verif
+    blkc = BlockChain()
     Mblock = bestblock(mr)
-    BlockChain.add_block(Mblock)
+    blkc.add_block(Mblock)
 
 def run_thread():
     print("Starting Election/Mining rocess")

@@ -2,10 +2,11 @@ import socket
 import selectors
 import types
 import os
-import multiprocessing
-import threads.broadcast  
+import multiprocessing 
 from threads.receiver import *  
 from threads.rpc import rpc_receive
+from threads.election import run_thread
+from threads.broadcast import reciever
 host = '0.0.0.0'
 port = 8080
 
@@ -20,5 +21,7 @@ rpc=multiprocessing.Process(target=rpc_receive)
 rpc.start()
 receiver=multiprocessing.Process(target=broadcast_receive)
 receiver.start()
-broadcast=multiprocessing.Process(target=broadcast.reciever)
-broadcast.start()
+broadcast_process=multiprocessing.Process(target=reciever)
+broadcast_process.start()
+election_process = multiprocessing.Process(target=run_thread)
+election_process.start()

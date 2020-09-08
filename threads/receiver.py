@@ -6,12 +6,13 @@ import threading
 import requests
 import json
 import zmq
+import settings
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 from dotscoin.Block import Block
 
 host = '0.0.0.0'
-port = 7000
+port = settings.UDP_RECEIVER_PORT
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind((host,port))
 INVALID_DATA=False
@@ -36,7 +37,7 @@ def response_handler(data):
         elif data['command'] == "voteto":
             context = zmq.Context()
             z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:5009")
+            z3socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
             z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
             z3socket.close()
@@ -44,7 +45,7 @@ def response_handler(data):
         elif data['command'] == "addblock":
             context = zmq.Context()
             z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:5119")
+            z3socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
             z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
             z3socket.close()

@@ -1,4 +1,4 @@
-from datetime import datetime
+import time
 from dotscoin.Transaction import Transaction
 import redis
 import hashlib
@@ -8,15 +8,24 @@ from collections import Set, Mapping, deque
 
 
 class Block:
+    previous_block_hash: str = ""
+    height: int = 0
+    size: int = 0
+    timestamp = int(time.time())
+
     def __init__(self):
         self.hash: str = ""
-        self.timestamp = datetime.now()
         self.transactions: List[Transaction] = []
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        self.previous_block_hash = self.redis_client.lindex('chain', -1).hash
         self.merkle_root: str = ""
-        self.height = self.redis_client.lindex('chain', -1).height
         self.version: str = "0.0.1"
+        self.add_previous_block()
+
+    def add_previous_block(self):
+        raw = self.redis_client.lindex('chain', -1)
+        if raw is not None and json.loads(raw.decode('utf-8')) is not None:
+            self.previous_block_hash = json.loads(raw.decode("utf-8"))["hash"]
+            self.height = int(json.loads(raw.decode("utf-8"))["height"])+ 1 
 
     def add_transaction(self, transaction: Transaction):
         self.transactions.append(transaction)
@@ -59,9 +68,9 @@ class Block:
             "version": self.version,
             "size": self.size
         }
+        print(message)
 
-        self.hash = hashlib.sha256(json.dumps(
-            message).encode("utf-8")).hexdigest()
+        self.hash = hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
 
     def calculate_merkle_root(self, transactions=[]):
         new_tran = []
