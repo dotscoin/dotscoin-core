@@ -83,7 +83,6 @@ class Block:
             "version": self.version,
             "size": self.size
         }
-        print(message)
 
         self.hash = hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
 

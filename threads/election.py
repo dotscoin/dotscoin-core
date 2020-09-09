@@ -268,13 +268,18 @@ def add_block_nondel():
         Mblock = bestblock(mr)
         blkc.add_block(Mblock)
 
+def mining():
+    vf = Verification()
+    print(vf.full_chain_verify())
+
 def run_thread():
     print("Starting Election/Mining rocess")
-    t = threading.Thread(target=electionworker)
+    t = threading.Thread(target=mining)
+    # t = threading.Thread(target=electionworker)
     t.start()
     t.join()
-    t = threading.Thread(target=add_block_nondel)
-    t.start()
-    t.join()
+    # t = threading.Thread(target=add_block_nondel)
+    # t.start()
+    # t.join()
 
 
