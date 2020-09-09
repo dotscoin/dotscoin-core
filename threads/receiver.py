@@ -41,6 +41,7 @@ def response_handler(data):
             z3socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
             z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
+            print("vote aaya")
             z3socket.close()
             context.destroy()
         elif data['command'] == "addblock":
