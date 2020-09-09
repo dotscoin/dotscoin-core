@@ -27,7 +27,7 @@ def broadcast(data):
     #   add=node['addr'].split(":")
     #   udpsock.sendto(json.dumps(data).encode('utf-8'),(add[0],int(add[1])))
     #   print("broadcast")
-    udpsock.sendto(json.dumps(data).encode('utf-8'),('127.0.0.1', settings.UDP_RECEIVER_PORT))
+    udpsock.sendto(json.dumps(data).encode('utf-8'),('15.207.11.83', settings.UDP_RECEIVER_PORT))
 
 
 #reciever 
