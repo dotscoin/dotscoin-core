@@ -6,6 +6,7 @@ from dotscoin.Transaction import Transaction
 from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
 from dotscoin.Address import Address
+import addtransaction
 
 if __name__ == "__main__":
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -41,30 +42,12 @@ if __name__ == "__main__":
     }
 
     block = Block()
-    tx = Transaction()
-    add = Address()
-    add.load(add_data["sk"], add_data["vk"])
-
-    tx.inputs.append(TransactionInput.from_json({
-        'previous_tx': "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c",
-        'index': 0,
-        'scriptSig': [add.sign_message(json.dumps({
-            'previous_tx': "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c",
-            'index': 0
-        }).encode("utf-8")).hex()],
-        'address': add_data["address"],
-        'verifying_key': [add_data["vk"]]
-    }))
-    tx.outputs.append(TransactionOutput.from_json({
-        'address': "yikgyyf67rr68t887tfc",
-        'value': 25,
-        'n': 0
-    }))
-    tx.generate_hash()
-    block.add_transaction(tx)
-    block.calcalute_block_size()
+    txs = addtransaction.create_txs(15)
+    for tx in txs:
+        block.add_transaction(Transaction.from_json(tx))
     block.compute_hash()
     block.calculate_merkle_root()
+    block.calcalute_block_size()
 
     print(block.to_json())
     redis_client.rpush("chain", json.dumps(block.to_json()))
