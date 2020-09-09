@@ -2,6 +2,7 @@ import urllib.request
 import settings
 from dotscoin.BlockChain import BlockChain
 from dotscoin.Verification import Verification
+from dotscoin.Transaction import Transaction
 from dotscoin.Block import Block
 import json
 from collections import defaultdict
@@ -41,7 +42,7 @@ class Election:
     #     """
     #     nodes_list = urllib.request.urlopen("https://dns.dotscoin.com/nodes").read()
 
-    def election_fund(self):
+    def election_fund_initial(self):
         # print(self.redis_client.hget('fund '+self.fund_addr, "test234"))
         # # print(self.redis_client.hmset('fund '+self.fund_addr, {"test2": self.redis_client.hget('fund '+self.fund_addr,"test2") + 2}))
         # if self.redis_client.hget('fund '+self.fund_addr, "test234") == None:
@@ -50,6 +51,8 @@ class Election:
         #     self.redis_client.hmset('fund '+self.fund_addr, {"test234": self.redis_client.hincrby('fund '+self.fund_addr, "test234", 3463)})
 
         # print(self.redis_client.hget('fund '+self.fund_addr, "test23"))
+
+        #chain scan 
         chain_length = self.redis_client.llen('chain')
         i = 0
         while i < chain_length:
@@ -59,9 +62,11 @@ class Election:
             if block == None:
                 return 
             for tx in block.transactions:
+                print(Transaction.to_json(tx))
                 for out in tx.outputs:
                     if out.address == self.fund_addr:
                         sender_addr = tx.inputs[0].address
+                        # print(sender_addr)
                         if self.redis_client.hget('fund '+self.fund_addr, sender_addr) == None:
                             self.redis_client.hmset('fund '+self.fund_addr, {sender_addr: out.value})
                         else:
@@ -70,10 +75,11 @@ class Election:
         return 
 
     def get_stakes(self):
-        self.election_fund()
+        self.election_fund_initial()
         fetch_stakes_bytes = self.redis_client.hgetall('fund '+self.fund_addr)
+        print(fetch_stakes_bytes)
         fetch_stakes = { y.decode('ascii'): fetch_stakes_bytes.get(y).decode('ascii') for y in fetch_stakes_bytes.keys() }
-        # print(fetch_stakes)
+        print(fetch_stakes)
         self.stakes = fetch_stakes
 
     def vote_to(self):
@@ -166,7 +172,7 @@ def bestblock(merkle_roots=[]):
 
 def worker():
     elec = Election()
-    elec.election_fund()
+    # elec.election_fund()
     elec.get_stakes()
     elec.vote_to()
     print("vote sent and waiting for other's votes")
