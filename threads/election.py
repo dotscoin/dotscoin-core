@@ -95,7 +95,7 @@ class Election:
         context = zmq.Context()
         z2socket = context.socket(zmq.REQ)
         z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-        z2socket.send_string(json.dumps({"voter_addr":self.this_node_addr, "voted_addr":select}))
+        z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
         message = z2socket.recv()
         z2socket.close()
         return 
@@ -168,6 +168,7 @@ def worker():
     elec.election_fund()
     elec.get_stakes()
     elec.vote_to()
+    print("vote sent and waiting for other's votes")
     context = zmq.Context()
     zsocket = context.socket(zmq.REP)
     zsocket.bind("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
@@ -228,7 +229,7 @@ def electionworker():
                 context = zmq.Context()
                 z4socket = context.socket(zmq.REQ)
                 z4socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-                z4socket.send_string(json.dumps(block))
+                z4socket.send_string(json.dumps({'data':block, 'command':'addblock'}))
                 message = z4socket.recv()
                 z4socket.close()
             else:

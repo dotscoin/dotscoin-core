@@ -38,7 +38,7 @@ def response_handler(data):
         elif data['command'] == "voteto":
             context = zmq.Context()
             z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
+            z3socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
             z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
             z3socket.close()
@@ -46,7 +46,7 @@ def response_handler(data):
         elif data['command'] == "addblock":
             context = zmq.Context()
             z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
+            z3socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
             z3socket.send_string(json.dumps(data['data']))
             message = z3socket.recv()
             z3socket.close()
