@@ -38,5 +38,6 @@ def reciever():
     z1socket.bind("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
     while True:
         data = json.loads(z1socket.recv_string())
+        print(data)
         broadcast(data)
         z1socket.send_string("recieved")

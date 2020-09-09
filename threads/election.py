@@ -97,6 +97,7 @@ class Election:
         z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
         z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
         message = z2socket.recv()
+        print(message)
         z2socket.close()
         return 
 

@@ -1,9 +1,9 @@
 
 from wsgiref.simple_server import make_server, WSGIServer
 import socketserver
-
+import settings
 host='0.0.0.0'
-port=7000
+port=settings.RPC_PORT
 class ThreadingWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     daemon_threads = True
 
