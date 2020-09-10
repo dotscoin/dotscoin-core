@@ -28,11 +28,11 @@ def broadcast(data):
     #   add=node['addr'].split(":")
     #   udpsock.sendto(json.dumps(data).encode('utf-8'),(add[0],int(add[1])))
     #   print("broadcast")
-    udpsock.sendto(json.dumps(data).encode('utf-8'),('15.207.11.83', settings.UDP_RECEIVER_PORT))
+    udpsock.sendto(json.dumps(data).encode('utf-8'),('34.122.30.88', settings.UDP_RECEIVER_PORT))
 
 
 #reciever 
-def reciever():
+def broadcaster():
     print("Starting Broadcast Process")
     context = zmq.Context()
     z1socket = context.socket(zmq.REP)
