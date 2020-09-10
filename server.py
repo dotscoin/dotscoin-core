@@ -30,8 +30,8 @@ def run_threads():
     rpc.start()
     receiver=multiprocessing.Process(target=broadcast_receive)
     receiver.start()
-    broadcast_process=multiprocessing.Process(target=broadcaster)
-    broadcast_process.start()
+    # broadcast_process=multiprocessing.Process(target=broadcaster)
+    # broadcast_process.start()
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
 
