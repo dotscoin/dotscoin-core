@@ -13,7 +13,7 @@ import time
 from threads.receiver import *  
 from threads.rpc import rpc_receive
 from threads.election import run_thread
-from threads.broadcast import reciever
+from threads.broadcast import broadcaster
 from dotscoin.Address import Address
 host = '0.0.0.0'
 port = 8080
@@ -30,7 +30,7 @@ def run_threads():
     rpc.start()
     receiver=multiprocessing.Process(target=broadcast_receive)
     receiver.start()
-    broadcast_process=multiprocessing.Process(target=reciever)
+    broadcast_process=multiprocessing.Process(target=broadcaster)
     broadcast_process.start()
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()

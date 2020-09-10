@@ -32,7 +32,7 @@ def broadcast(data):
 
 
 #reciever 
-def reciever():
+def broadcaster():
     print("Starting Broadcast Process")
     context = zmq.Context()
     z1socket = context.socket(zmq.REP)
