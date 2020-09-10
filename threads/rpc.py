@@ -17,6 +17,7 @@ host = '0.0.0.0'
 port = settings.RPC_PORT
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
+from threads.broadcast import broadcast
 
 def response_handler(data):
     keys=['data','command']
@@ -37,12 +38,13 @@ def response_handler(data):
             mempool = Mempool()
             mempool.add_transaction(tx)
             #To broadcast
-            context = zmq.Context()
-            zsocket = context.socket(zmq.REQ)
-            zsocket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-            zsocket.send_string(json.dumps(data))
-            message = zsocket.recv()
-            zsocket.close()
+            broadcast(tx)
+            # context = zmq.Context()
+            # zsocket = context.socket(zmq.REQ)
+            # zsocket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
+            # zsocket.send_string(json.dumps(data))
+            # message = zsocket.recv()
+            # zsocket.close()
     
 @get('/')
 def listening_handler():

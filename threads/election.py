@@ -14,7 +14,7 @@ import redis
 import threading
 import urllib.request
 import settings
-
+from threads.broadcast import broadcast
 
 def bestblock(merkle_roots=[]):
     key_value = dict()
@@ -86,14 +86,15 @@ def mining():
     full_verify_message = elec.verification.full_chain_verify()
     if full_verify_message == "verified":
         # braodcast the block you made
-        context = zmq.Context()
-        z4socket = context.socket(zmq.REQ)
-        z4socket.connect("tcp://127.0.0.1:%s" %
-                            settings.BROADCAST_ZMQ_PORT)
-        z4socket.send_string(json.dumps(
-            {'data': block, 'command': 'addblock'}))
-        message = z4socket.recv()
-        z4socket.close()
+        broadcast({'data': block, 'command': 'addblock'})
+        # context = zmq.Context()
+        # z4socket = context.socket(zmq.REQ)
+        # z4socket.connect("tcp://127.0.0.1:%s" %
+        #                     settings.BROADCAST_ZMQ_PORT)
+        # z4socket.send_string(json.dumps(
+        #     {'data': block, 'command': 'addblock'}))
+        # message = z4socket.recv()
+        # z4socket.close()
     else:
         return
 

@@ -9,6 +9,7 @@ from dotscoin.Verification import Verification
 from dotscoin.Transaction import Transaction
 from dotscoin.Block import Block
 from collections import defaultdict
+from threads.broadcast import broadcast
 
 class Election:
     """
@@ -82,13 +83,14 @@ class Election:
         # add your vote to this node's this election's votes array
         self.votes[self.this_node_addr] = select
         # Broadcast the selected node to vote
-        context = zmq.Context()
-        z2socket = context.socket(zmq.REQ)
-        z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-        z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
-        message = z2socket.recv()
-        print(message)
-        z2socket.close()
+        broadcast({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'})
+        # context = zmq.Context()
+        # z2socket = context.socket(zmq.REQ)
+        # z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
+        # z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
+        # message = z2socket.recv()
+        # print(message)
+        # z2socket.close()
         return 
 
     def add_vote(self, vote):
