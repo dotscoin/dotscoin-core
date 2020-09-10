@@ -19,13 +19,13 @@ class Election:
         self.primary_representatives = dict()
         self.blockchain = BlockChain()
         self.fund_addr = ""
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.redis_client.hmset('fund '+self.fund_addr, {'total fund': 00})
         self.this_node_addr = "addr1"
         self.stakes = dict()
         self.votes = dict()
         self.verification =  Verification()
         self.load_election_fund_details()
-        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def load_election_fund_details(self):
         f = open('electionfund.json',) 

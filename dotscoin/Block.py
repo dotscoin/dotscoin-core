@@ -18,8 +18,8 @@ class Block:
     size: int = 0
 
     def __init__(self): 
-        self.add_previous_block()
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        self.add_previous_block()
 
     def add_previous_block(self):
         raw = self.redis_client.lindex('chain', -1)
