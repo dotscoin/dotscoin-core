@@ -3,6 +3,7 @@ import selectors
 import types
 import os
 import multiprocessing 
+import time
 from threads.receiver import *  
 from threads.rpc import rpc_receive
 from threads.election import run_thread
@@ -16,7 +17,7 @@ if cpucount < 4:
     print("this version of software can't run on your system")
     exit()
 
-
+time.sleep(5)
 rpc=multiprocessing.Process(target=rpc_receive)
 rpc.start()
 receiver=multiprocessing.Process(target=broadcast_receive)

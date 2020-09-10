@@ -166,6 +166,7 @@ def bestblock(merkle_roots=[]):
 
 def worker():
     elec = Election()
+    elec.get_node_addr()
     elec.election_fund()
     elec.get_stakes()
     elec.vote_to()
