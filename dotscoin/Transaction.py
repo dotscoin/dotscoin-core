@@ -1,3 +1,4 @@
+import json
 import time
 import hashlib
 from ecdsa import VerifyingKey, BadSignatureError
@@ -84,4 +85,31 @@ class Transaction:
             else: 
                 return False
         return True
+
+    def txs_by_addr(self, addr):
+        i = 1
+        txs = []
+        while True:
+            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            if block == None:
+                return txs
+            else:
+                for tx in block.txs:
+                    if tx.inputs[0].address == addr:
+                        txs.append(tx)
+            i = i + 1
+        return txs
+    
+    def tx_by_hash(self, hash):
+        i = 1
+        while True:
+            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            if block == None:
+                return None
+            else:
+                for tx in block.txs:
+                    if tx.hash == hash:
+                        return tx
+            i = i + 1
+        return None
               

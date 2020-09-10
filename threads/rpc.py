@@ -18,9 +18,10 @@ port = settings.RPC_PORT
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 from threads.broadcast import broadcast
+from dotscoin.Rpc import Rpc
 
 def response_handler(data):
-    keys=['data','command']
+    keys=['command','parameters', 'body']
     INVALID_DATA = False
 
     for key in keys:
@@ -32,27 +33,47 @@ def response_handler(data):
         }
         return json.dumps(response)
     else:
+        # if data['command'] == "addtransaction":
+        #     #To mempool
+        #     tx = Transaction.from_json(data['data'])
+        #     mempool = Mempool()
+        #     mempool.add_transaction(tx)
+        #     #To broadcast
+        #     broadcast(tx)
+        #     # context = zmq.Context()
+        #     # zsocket = context.socket(zmq.REQ)
+        #     # zsocket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
+        #     # zsocket.send_string(json.dumps(data))
+        #     # message = zsocket.recv()
+        #     # zsocket.close()
         if data['command'] == "addtransaction":
-            #To mempool
-            tx = Transaction.from_json(data['data'])
-            mempool = Mempool()
-            mempool.add_transaction(tx)
-            #To broadcast
-            broadcast(tx)
-            # context = zmq.Context()
-            # zsocket = context.socket(zmq.REQ)
-            # zsocket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-            # zsocket.send_string(json.dumps(data))
-            # message = zsocket.recv()
-            # zsocket.close()
+            rpc_handler= Rpc()
+            response=rpc_handler.addTransaction(data)
+        elif data['command'] == "getlastblock":
+            rpc_handler=Rpc()
+            response=rpc_handler.getlastblock(data)
+        elif data['command'] == "getaddressbalance":
+            rpc_handler= Rpc()
+            response=rpc_handler.getaddressbalance(data)
+        elif data['command'] == "getblockbyheight":
+            rpc_handler= Rpc()
+            response=rpc_handler.getblockbyheight()
+        elif data['command'] == "gettxsbyaddress":
+            rpc_handler= Rpc()
+            response=rpc_handler.gettxsbyaddress()
+        elif data['command'] == "gettxbyhash":
+            rpc_handler=Rpc()
+            response=rpc_handler.gettxbyhash()
+        elif data['command'] == "getnodeinfo":
+            rpc_handler=Rpc()
+            response=rpc_handler.getnodeinfo()
+        elif data['command'] == "getstakes":
+            rpc_handler = Rpc()
+            reponse=rpc_handler.getstakes()
+        
+        return reponse
     
-@get('/')
-def listening_handler():
-    '''Handles name creation'''
-    # return 200 Success
-    data= {"hello":"world"}
-    return data
-          
+             
 @post('/')
 def posting_handler():
     data=request.json

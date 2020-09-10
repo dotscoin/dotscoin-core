@@ -62,9 +62,7 @@ class Election:
     def get_stakes(self):
         self.election_fund_initial()
         fetch_stakes_bytes = self.redis_client.hgetall('fund '+self.fund_addr)
-        print(fetch_stakes_bytes)
         fetch_stakes = { y.decode('ascii'): fetch_stakes_bytes.get(y).decode('ascii') for y in fetch_stakes_bytes.keys() }
-        print(fetch_stakes)
         self.stakes = fetch_stakes
 
     def vote_to(self):
