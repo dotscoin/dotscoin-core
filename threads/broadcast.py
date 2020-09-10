@@ -9,26 +9,21 @@ import json
 import urllib.request
 import settings
 
-host = '0.0.0.0'
-port = settings.UDP_BROADCAST_PORT
+
 INVALID_DATA=False
 
 def get_nodes():
     response = urllib.request.urlopen("http://dns.dotscoin.com/get_nodes").read()
     return json.loads(response)['nodes']
 
-udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-udpsock.bind((host,port))
-
 def broadcast(data):
-    # nodes= get_nodes()
-    # print(nodes)
-    # for node in nodes:
-    #   add=node['addr'].split(":")
-    #   udpsock.sendto(json.dumps(data).encode('utf-8'),(add[0],int(add[1])))
-    #   print("broadcast")
+    host = '0.0.0.0'
+    port = settings.UDP_BROADCAST_PORT
+    udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    udpsock.bind((host,port))
     udpsock.sendto(json.dumps(data).encode('utf-8'),('34.122.30.88', settings.UDP_RECEIVER_PORT))
+    udpsock.close()
 
 
 #reciever 
