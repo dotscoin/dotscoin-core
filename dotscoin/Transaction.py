@@ -12,12 +12,13 @@ class TransactionStatus(str, Enum):
     CONFIRMED = "Confirmed"
 
 class Transaction:
+
     timestamp = time.time()
     version: str = "0.0.1"
     hash: str = ""
     inputs: List[TransactionInput] = []
     outputs: List[TransactionOutput] = []
-    block = "Mempool"
+    block = "Mempool" 
     
     def add_input(self, ti: TransactionInput):
         self.inputs.append(ti)
@@ -34,7 +35,6 @@ class Transaction:
         tmp.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
         tmp.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
         tmp.block = data['block']
-
         return tmp
 
     def to_json(self):
@@ -54,7 +54,6 @@ class Transaction:
             'input': str(self.inputs),
             'output': str(self.outputs)
         }
-
         self.hash = hashlib.sha256(str(message).encode()).hexdigest()
 
     def generate_signature(self, sk):

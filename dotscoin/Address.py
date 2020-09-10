@@ -1,8 +1,8 @@
-from typing import Any
-from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 import hashlib
 import json
 import redis
+from typing import Any
+from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 
 class Address:
     def __init__(self):

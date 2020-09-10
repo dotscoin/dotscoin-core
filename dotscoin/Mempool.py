@@ -1,12 +1,10 @@
-from queue import LifoQueue
-from dotscoin.Transaction import Transaction
 import redis
 import json
+from dotscoin.Transaction import Transaction
 
 class Mempool:
     """ This class stores all the transactions in a temporary cache memory for block generation. """
     def __init__(self):
-        # self.transactions = LifoQueue(maxsize=8000)
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def add_transaction(self, val: Transaction) -> bool:

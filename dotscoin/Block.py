@@ -1,24 +1,24 @@
 import time
-from dotscoin.Transaction import Transaction
 import redis
 import hashlib
-from typing import List
 import json
-from collections import Set, Mapping, deque
 import sys
+from typing import List
+from dotscoin.Transaction import Transaction
+from collections import Set, Mapping, deque
 
 class Block:
-    previous_block_hash: str = ""
-    height: int = 0
-    size: int = 0
+    hash: str = ""
     timestamp = int(time.time())
+    transactions: List[Transaction] = []
+    previous_block_hash: str = ""
+    merkle_root: str = ""
+    height: int = 0
+    version: str = "0.0.1"
+    size: int = 0
 
-    def __init__(self):
-        self.hash: str = ""
-        self.transactions: List[Transaction] = []
+    def __init__(self): 
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        self.merkle_root: str = ""
-        self.version: str = "0.0.1"
         self.add_previous_block()
 
     def add_previous_block(self):
@@ -60,7 +60,6 @@ class Block:
     @staticmethod
     def from_json(data):
         tmp = Block()
-
         tmp.hash = data['hash']
         tmp.timestamp = data['timestamp']
         tmp.transactions = [Transaction.from_json(
@@ -70,7 +69,6 @@ class Block:
         tmp.height = data['height']
         tmp.version = data['version']
         tmp.size = data['size']
-
         return tmp
 
     def compute_hash(self):

@@ -1,13 +1,13 @@
-from dotscoin.BlockChain import BlockChain
-from dotscoin.Verification import Verification
-from dotscoin.Transaction import Transaction
-from dotscoin.Block import Block
 import redis
 import urllib.request
 import json
 import random
 import zmq
 import settings
+from dotscoin.BlockChain import BlockChain
+from dotscoin.Verification import Verification
+from dotscoin.Transaction import Transaction
+from dotscoin.Block import Block
 from collections import defaultdict
 
 class Election:
@@ -18,8 +18,8 @@ class Election:
     def __init__(self):
         self.primary_representatives = dict()
         self.blockchain = BlockChain()
-        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.fund_addr = ""
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.redis_client.hmset('fund '+self.fund_addr, {'total fund': 00})
         self.this_node_addr = "addr1"
         self.stakes = dict()
@@ -36,24 +36,7 @@ class Election:
         response = urllib.request.urlopen("https://checkip.amazonaws.com/").read()
         self.this_node_addr = response.decode("utf-8").strip()
 
-
-    # @staticmethod
-    # def load_all_nodes():
-    #     """
-    #         Loads all the primary representatives in the network.
-    #     """
-    #     nodes_list = urllib.request.urlopen("https://dns.dotscoin.com/nodes").read()
-
     def election_fund_initial(self):
-        # print(self.redis_client.hget('fund '+self.fund_addr, "test234"))
-        # # print(self.redis_client.hmset('fund '+self.fund_addr, {"test2": self.redis_client.hget('fund '+self.fund_addr,"test2") + 2}))
-        # if self.redis_client.hget('fund '+self.fund_addr, "test234") == None:
-        #     self.redis_client.hmset('fund '+self.fund_addr, {"test234": 2})
-        # else:
-        #     self.redis_client.hmset('fund '+self.fund_addr, {"test234": self.redis_client.hincrby('fund '+self.fund_addr, "test234", 3463)})
-
-        # print(self.redis_client.hget('fund '+self.fund_addr, "test23"))
-
         #chain scan 
         chain_length = self.redis_client.llen('chain')
         i = 0
@@ -68,7 +51,6 @@ class Election:
                 for out in tx.outputs:
                     if out.address == self.fund_addr:
                         sender_addr = tx.inputs[0].address
-                        # print(sender_addr)
                         if self.redis_client.hget('fund '+self.fund_addr, sender_addr) == None:
                             self.redis_client.hmset('fund '+self.fund_addr, {sender_addr: out.value})
                         else:
@@ -124,33 +106,3 @@ class Election:
             dels = list(reversed(list(votes_count)))
         return dels
 
-    # def run_election(self):
-    #     self.get_stakes()
-    #     self.vote_to()
-    #     self.get_vote()
-    #     dels = self.delegates()
-
-    #     for dele in dels:
-    #         if dele == self.this_node_addr:
-    #             blk = Block()
-    #             for i in range(0,20):
-    #                 tx = self.redis_client.lindex('mempool', i).decode('utf-8')
-    #                 if tx == None:
-    #                     break
-    #                 verify_verdict = self.verification.verify_tx(tx)
-    #                 if verify_verdict == "verified":
-    #                     #map to blk/create block
-    #                     blk.add_transaction(tx)
-    #                 else:
-    #                     i =  i - 1
-    #                     continue
-    #             #add block
-    #             blkChain = blockchain()
-    #             blkChain.add_block(blk)
-
-    #             #full blockchain verify
-    #             full_verify_message = self.verification.full_chain_verify()
-    #             if full_verify_message == "verified": 
-    #                 pass
-    #             else:
-    #                 return
