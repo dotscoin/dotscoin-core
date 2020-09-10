@@ -51,19 +51,19 @@ def response_handler(data):
             response=rpc_handler.addTransaction(data)
         elif data['command'] == "getlastblock":
             rpc_handler=Rpc()
-            response=rpc_handler.getlastblock(data)
+            response=rpc_handler.getlastblock()
         elif data['command'] == "getaddressbalance":
             rpc_handler= Rpc()
             response=rpc_handler.getaddressbalance(data)
         elif data['command'] == "getblockbyheight":
             rpc_handler= Rpc()
-            response=rpc_handler.getblockbyheight()
+            response=rpc_handler.getblockbyheight(data)
         elif data['command'] == "gettxsbyaddress":
             rpc_handler= Rpc()
-            response=rpc_handler.gettxsbyaddress()
+            response=rpc_handler.gettxsbyaddress(data)
         elif data['command'] == "gettxbyhash":
             rpc_handler=Rpc()
-            response=rpc_handler.gettxbyhash()
+            response=rpc_handler.gettxbyhash(data)
         elif data['command'] == "getnodeinfo":
             rpc_handler=Rpc()
             response=rpc_handler.getnodeinfo()
