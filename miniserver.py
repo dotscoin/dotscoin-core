@@ -11,15 +11,15 @@ import threading
 def rpc_mining():
     rpc=threading.Thread(target=rpc_receive)
     mining=threading.Thread(target=run_thread)
-    mining.daemon=True
-    rpc.daemon=True
+    # mining.daemon=True
+    # rpc.daemon=True
     rpc.start()
     mining.start()
 def broadcast_receive():
     broadcast=threading.Thread(target=broadcaster)
     reciever=threading.Thread(target=broadcast_receive)
-    broadcast.daemon=True
-    reciever.daemon=True
+    # broadcast.daemon=True
+    # reciever.daemon=True
     broadcast.start()
     reciever.start()
 
