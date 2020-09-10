@@ -18,6 +18,7 @@ def get_nodes():
     return json.loads(response)['nodes']
 
 udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 udpsock.bind((host,port))
 
 def broadcast(data):

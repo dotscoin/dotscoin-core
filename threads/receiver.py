@@ -14,7 +14,8 @@ from dotscoin.Block import Block
 host = '0.0.0.0'
 port = settings.UDP_RECEIVER_PORT
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-sock.bind((host,port))
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind((host, port))
 INVALID_DATA=False
 
 def response_handler(data):

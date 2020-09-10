@@ -5,4 +5,4 @@ if __name__ == '__main__':
 
     print(redis_client.llen("mempool"))
     print(redis_client.lrange("chain",0,-1))
-    print(redis_client.flushall())
+    # print(redis_client.flushall())

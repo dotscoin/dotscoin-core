@@ -52,11 +52,13 @@ class Verification:
     def full_chain_verify(self):
         verify_message = "unverified"
         for i in range(0, self.chain_length):
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
-            v_merkl_root = self.block.calculate_merkle_root(block.txs)
-            if v_merkl_root != block.merkle_root: 
+            raw = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            block = Block.from_json(raw)
+            block.calculate_merkle_root()
+            v_merkl_root = block.merkle_root
+            if v_merkl_root != raw["merkle_root"]: 
                 verify_message = "failed"
-                self.del_from_faultblock(i)
+                # self.del_from_faultblock(i)
         verify_message = "verified"
         return verify_message
     
