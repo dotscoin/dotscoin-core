@@ -1,10 +1,8 @@
 import socket
 
-
 class Node:
-    def __init__(self):
-        self.ip_address: str = ""
-        pass
+
+    ip_address: str = ""
 
     def load_own_node(self):
         hostname = socket.gethostname()
