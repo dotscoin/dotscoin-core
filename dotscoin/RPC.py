@@ -7,7 +7,6 @@ from dotscoin.Address import Address
 class RPC:
     #check for type of data sent
     def __init__(self):
-        super().__init__()
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.command_mapping = {
             'addtransaction': self.addtransaction,
@@ -21,7 +20,18 @@ class RPC:
         }
 
     def handlecommand(self, data):
-        pass
+        if data["command"] in self.command_mapping.keys():
+            if "parameters" in data.keys():
+                return self.command_mapping[data["command"]](data["parameters"])
+            elif "body" in data.keys():
+                return self.command_mapping[data["command"]](data["body"])
+            else:
+                return self.command_mapping[data["command"]]()
+        else:
+            return json.dumps({
+                "error": "RPC Command doesn't exists"
+            })
+
 
     def addtransaction(self, data):
         tx = Transaction.from_json(data['body'])

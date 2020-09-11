@@ -10,7 +10,7 @@ import settings
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 from dotscoin.Block import Block
-from dotscoin.UDP import UdpHandler
+from dotscoin.UDPHandler import UDPHandler
 
 host = '0.0.0.0'
 port = settings.UDP_RECEIVER_PORT
@@ -34,25 +34,25 @@ def response_handler(data):
     else:
         print(data)
         if data['command'] == "sendtransaction":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.sendtransaction(data)
         elif data['command'] == "castvote":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.castvote(data)
         elif data['command'] == "sendblock":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.sendblock(data)
         elif data['command'] == "getblockbyheight":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.getblockbyheight(data)
         elif data['command'] == "getmempoollength":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.getmempoollength(data)
         elif data['command'] == "gettxbymindex":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.gettxbymindex(data)
         elif data['command'] == "getchainlength":
-            udp_handler=UdpHandler()
+            udp_handler=UDPHandler()
             udp_handler.getchainlength(data)   
         response = {
         "message":"ok"

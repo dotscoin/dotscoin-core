@@ -3,7 +3,6 @@ import json
 import redis
 from typing import Any
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
-from dotscoin.Block import Block
 
 class Address:
     def __init__(self):

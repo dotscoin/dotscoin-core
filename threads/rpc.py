@@ -22,19 +22,10 @@ port = settings.RPC_PORT
 
 def response_handler(data):
     rpc = RPC()
-    keys = ['command', 'parameters', 'body']
-    INVALID_DATA = False
+    response = rpc.handlecommand(data)
 
-    for key in keys:
-        if not key in data.keys():
-            INVALID_DATA = True
-    if INVALID_DATA:
-        response = {
-            "error": "invaid type of data"
-        }
-        return json.dumps(response)
-    else:
-        
+    return response
+
 
 @post('/')
 def posting_handler():
