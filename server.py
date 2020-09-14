@@ -1,3 +1,4 @@
+# all imports
 import socket
 import selectors
 import types
@@ -14,10 +15,14 @@ from threads.receiver import *
 from threads.rpc import rpc_receive
 from threads.election import run_thread
 from dotscoin.Address import Address
+from threads.storage import start
+
+# Defining host and port to run the main server on
 host = '0.0.0.0'
 port = 8080
 
 def cpu_count():
+    """ Returns CPU count and software compatibility """
     cpucount = os.cpu_count()
     print("total cpu cores in the system=",cpucount)
     if cpucount < 2:
@@ -31,6 +36,8 @@ def run_threads():
     # receiver.start()
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
+    storage_process = multiprocessing.Process(target=start)
+    storage_process.start()
 
 def add_my_node(my_node):
     body = json.dumps(my_node).encode('utf-8')

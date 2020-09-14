@@ -48,8 +48,8 @@ def thread(self):
 
     if filetype == "temp":
         #split and broadcast
-        self.file_split(filename,4)
-        msg = self.file_send(4, filehash, fileaddr)
+        self.file_split(filename,2)
+        msg = self.file_send(2, filehash, fileaddr)
         if msg == None:
             client_socket.close()
         else:
@@ -91,9 +91,10 @@ def file_send(n, filehash, fileaddr):
     mem = Mempool()
     udp = UDPHandler()
     stx.add_input(filehash,fileaddr)
+    recv_hosts = ['34.122.73.13', '104.196.106.117']
     for i in range(0,n):
-        host = "rcv host"
-        port = "rcv port"
+        host = recv_hosts[i]
+        port = "5643"
 
         filename = settings.TEMP_STORAGE_PATH + "output" + str(i) + ".format"
         filesize = math.ceil(os.path.getsize(filename))
