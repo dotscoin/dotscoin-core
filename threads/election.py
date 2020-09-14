@@ -14,7 +14,7 @@ import redis
 import threading
 import urllib.request
 import settings
-from threads.broadcast import broadcast
+from dotscoin.UDPHandler import UDPHandler
 
 def bestblock(merkle_roots=[]):
     key_value = dict()
@@ -86,7 +86,7 @@ def mining():
     full_verify_message = elec.verification.full_chain_verify()
     if full_verify_message == "verified":
         # braodcast the block you made
-        broadcast({'data': block, 'command': 'addblock'})
+        UDPHandler.broadcastmessage({'data': block, 'command': 'addblock'})
         # context = zmq.Context()
         # z4socket = context.socket(zmq.REQ)
         # z4socket.connect("tcp://127.0.0.1:%s" %

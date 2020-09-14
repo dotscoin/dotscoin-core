@@ -59,6 +59,37 @@ class Address:
             i = i + 1
         return total
 
+    def get_transactions(self):
+        my_addr = self.get_public_address()
+        response = []
+        chain_length = self.redis_client.llen("chain")
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex("chain", chain_length - 1).decode("utf-8")))
+            for tx in block.transactions:
+                if len(tx.inputs) == 0:
+                    continue
+                if tx.inputs[0].address == my_addr:
+                    response.append(tx)
+            chain_length -= 1
+
+        return response
+
+    @staticmethod
+    def get_transactions_by_address(addr: str):
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        response = []
+        chain_length = redis_client.llen("chain")
+        while chain_length > 0:
+            block = Block.from_json(json.loads(redis_client.lindex("chain", chain_length - 1).decode("utf-8")))
+            for tx in block.transactions:
+                if len(tx.inputs) == 0:
+                    continue
+                if tx.inputs[0].address == addr:
+                    response.append(tx)
+            chain_length -= 1
+
+        return response
+
     
 
 
