@@ -1,7 +1,8 @@
 import hashlib
 import os, random, struct
 from Crypto.Cipher import AES
-
+from Crypto import Random
+import sys
 class FileHash:
     
     def __init__(self,path,parts):
@@ -23,16 +24,16 @@ class FileHash:
                chunk = file.read(self.block_size)
        self.calculate_merkle_root(self.hash)
 
-    def encrypt_file(self,key, in_filename, out_filename=None, chunksize=64*1024):
+    def encrypt_file(self,key, out_filename=None, chunksize=64*1024):
 
         if not out_filename:
-            out_filename = in_filename + '.enc'
+            out_filename = self.filepath + '.enc'
 
-        iv = ''.join(chr(random.randint(0, 0xFF)) for i in range(16))
+        iv = Random.new().read( AES.block_size )
         encryptor = AES.new(key, AES.MODE_CBC, iv)
-        filesize = os.path.getsize(in_filename)
+        filesize = os.path.getsize(self.filepath)
 
-        with open(in_filename, 'rb') as infile:
+        with open(self.filepath, 'rb') as infile:
             with open(out_filename, 'wb') as outfile:
                 outfile.write(struct.pack('<Q', filesize))
                 outfile.write(iv)
