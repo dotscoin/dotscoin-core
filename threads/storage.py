@@ -7,6 +7,7 @@ import threading
 from dotscoin.StorageTx import StorageTx
 from dotscoin.Mempool import Mempool
 from dotscoin.UDPHandler import UDPHandler
+import json
 
 SERVER_HOST = settings.NODE_IP
 SERVER_PORT = settings.FILE_RECV_PORT
@@ -108,8 +109,8 @@ def file_send(n, filehash, fileaddr):
         
         send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}".encode())
         with open(filename, "rb") as f:
-            bytes = f.read() # read entire file as bytes
-            genhash = hashlib.sha256(bytes).hexdigest()
+            # bytes = f.read() # read entire file as bytes
+            # genhash = hashlib.sha256(bytes).hexdigest()
             while True:
                 bytes_read = f.read(BUFFER_SIZE)
                 if not bytes_read:
@@ -117,7 +118,7 @@ def file_send(n, filehash, fileaddr):
                 send.sendall(bytes_read)
         # filehash = send.recv(BUFFER_SIZE).decode('utf-8')
         # if genhash == filehash:
-        stx.add_output(filehash, host)
+        # stx.add_output(filehash, host)
         # else:
         #     return "tx error"
         send.close()

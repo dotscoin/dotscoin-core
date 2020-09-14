@@ -29,7 +29,7 @@ class StorageTx:
     def gen_tx_hash(self, tmp = []):
         new_tran = []
         if len(tmp) == 0:
-            tmp = [hsh for hsh in temp]
+            tmp = [hsh for hsh in self.temp]
         if len(tmp) > 1:
             if tmp[-1] == tmp[-2]:
                 return ""
