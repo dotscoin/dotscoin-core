@@ -4,8 +4,8 @@ import settings
 import hashlib
 import math
 import threading
-from StorageTx import StorageTx
-from Mempool import Mempool
+from dotscoin.StorageTx import StorageTx
+from dotscoin.Mempool import Mempool
 from dotscoin.UDPHandler import UDPHandler
 
 SERVER_HOST = settings.NODE_IP
@@ -22,7 +22,7 @@ def start(self):
     t = threading.Thread(target=self.thread)
     t.start()
     t2 = threading.Thread(target=self.thread)
-    t2.strat()
+    t2.start()
     t.join()
     t2.join()
 

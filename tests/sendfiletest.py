@@ -8,11 +8,11 @@ SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 1024
 
 # the ip address or hostname of the server, the receiver
-host = "127.0.0.1"
+host = "34.74.0.126"
 # the port, let's use 5001
 port = 5001
 # the name of file we want to send, make sure it exists
-filename = "/home/rishav4101/12345.mkv"
+filename = "/home/test.mp4"
 # get the file size
 filesize = os.path.getsize(filename)
 
