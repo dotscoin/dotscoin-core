@@ -10,7 +10,7 @@ class StorageTx:
     outputs = []
     temp = []
 
-    def add_input(hash, addr):
+    def add_input(self, hash, addr):
         temp.append(hash)
         inp = {
             "file_hash" : hash,
@@ -19,14 +19,14 @@ class StorageTx:
         inputs.append(inp)
         return
     
-    def add_output(hash, addr):
+    def add_output(self, hash, addr):
         temp.append(hash)
         out = {
             "part_hash" : hash,
             "storage_addr" : addr,
         }
 
-    def gen_tx_hash(tmp = []):
+    def gen_tx_hash(self, tmp = []):
         new_tran = []
         if len(tmp) == 0:
             tmp = [hsh for hsh in temp]
@@ -50,7 +50,7 @@ class StorageTx:
         else:
             self.gen_tx_hash(new_tran)
 
-    def to_json():
+    def to_json(self):
         return {
             "hash": self.hash,
             "block": self.block,
