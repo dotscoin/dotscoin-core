@@ -43,7 +43,7 @@ class FileHash:
                     if len(chunk) == 0:
                         break
                     elif len(chunk) % 16 != 0:
-                        chunk += ' ' * (16 - len(chunk) % 16)
+                        chunk += (' ' * (16 - len(chunk) % 16)).encode()
 
                     outfile.write(encryptor.encrypt(chunk))
         
@@ -51,7 +51,7 @@ class FileHash:
  
         if not out_filename:
             out_filename = os.path.splitext(in_filename)[0]
-
+           # decrypted=out_filename[0]
         with open(in_filename, 'rb') as infile:
             origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
             iv = infile.read(16)
