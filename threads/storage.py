@@ -48,8 +48,8 @@ def thread(s):
 
     if filetype == "temp":
         #split and broadcast
-        self.file_split(filename,2)
-        msg = self.file_send(2, filehash, fileaddr)
+        file_split(filename,2)
+        msg = file_send(2, filehash, fileaddr)
         if msg == None:
             client_socket.close()
         else:
