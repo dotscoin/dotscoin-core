@@ -47,12 +47,10 @@ class Election:
         while i < chain_length:
             raw = json.loads(self.redis_client.lindex(
                 'chain', i).decode('utf-8'))
-            print(raw)
             block = Block.from_json(raw)
             if block == None:
                 return
             for tx in block.transactions:
-                print(Transaction.to_json(tx))
                 for out in tx.outputs:
                     if out.address == self.fund_addr:
                         sender_addr = tx.inputs[0].address
