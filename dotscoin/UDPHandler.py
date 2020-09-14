@@ -6,7 +6,6 @@ import settings
 import socket
 import redis
 
-
 class UDPHandler:
     def __init__(self):
         command_mapping = {
