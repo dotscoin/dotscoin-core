@@ -4,8 +4,8 @@ import settings
 import hashlib
 import math
 import threading
-from StorageTx import StorageTx
-from Mempool import Mempool
+from dotscoin.StorageTx import StorageTx
+from dotscoin.Mempool import Mempool
 from dotscoin.UDPHandler import UDPHandler
 
 SERVER_HOST = settings.NODE_IP
