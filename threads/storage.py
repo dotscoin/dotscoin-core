@@ -3,8 +3,10 @@ import os
 import settings 
 import hashlib
 import math
+import threading
 from StorageTx import StorageTx
 from Mempool import Mempool
+from dotscoin.UDPHandler import UDPHandler
 
 SERVER_HOST = settings.NODE_IP
 SERVER_PORT = settings.FILE_RECV_PORT
@@ -12,56 +14,55 @@ SERVER_PORT = settings.FILE_RECV_PORT
 BUFFER_SIZE = 1024
 SEPARATOR = "<SEPARATOR>"
 
-def start():
+def start(self):
     s = socket.socket()
     s.bind((SERVER_HOST, SERVER_PORT))
     s.listen(5)
     print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
-    while True:
-        client_socket, address = s.accept() 
-        print(f"[+] {address} is connected.")
-        received = client_socket.recv(BUFFER_SIZE).decode()
-        filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
-        if filetype == "temp":
-            filename = os.path.basename(settings.TEMP_STORAGE_PATH + filename)
-        else:
-            filename = os.path.basename(settings.STORAGE_PATH + filename)
-        filesize = int(filesize)
+    t = threading.Thread(target=self.thread)
+    t.start()
+    t2 = threading.Thread(target=self.thread)
+    t2.strat()
+    t.join()
+    t2.join()
 
-        with open(filename, "wb") as f:
-            while True:
-                bytes_read = client_socket.recv(BUFFER_SIZE)
-                if not bytes_read:    
-                    break
-                f.write(bytes_read)
+def thread(self):
+    client_socket, address = s.accept() 
+    print(f"[+] {address} is connected.")
+    received = client_socket.recv(BUFFER_SIZE).decode()
+    filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
+    if filetype == "temp":
+        filename = os.path.basename(settings.TEMP_STORAGE_PATH + filename)
+    else:
+        filename = os.path.basename(settings.STORAGE_PATH + filename)
+    filesize = int(filesize)
 
-        # client_socket.close()
+    with open(filename, "wb") as f:
+        while True:
+            bytes_read = client_socket.recv(BUFFER_SIZE)
+            if not bytes_read:    
+                break
+            f.write(bytes_read)
 
-        if filetype == "temp":
-            #split and broadcast
-            file_split(filename,4)
-            file_send(4, filehash, fileaddr)
-            #create transaction
-            #store to Mempool
-            #broadcast transaction
+    # client_socket.close()
+
+    if filetype == "temp":
+        #split and broadcast
+        self.file_split(filename,4)
+        msg = self.file_send(4, filehash, fileaddr)
+        if msg == None:
             client_socket.close()
-            
         else:
-            with open(filename,"rb") as f:
-                bytes = f.read() # read entire file as bytes
-                readable_hash = hashlib.sha256(bytes).hexdigest()
-                print(readable_hash)
-            client_socket.send(readable_hash.encode('utf-8'))
-            #calulate CID and send
-            client_socket.close()
-            
-
-# def store(filename):
-#     file = os.path.basename(settings.STORAGE_PATH + filename)
-#     with open(file,"rb") as f:
-#         bytes = f.read() # read entire file as bytes
-#         readable_hash = hashlib.sha256(bytes).hexdigest()
-#         print(readable_hash)
+            return "storage failed"
+        
+    else:
+        with open(filename,"rb") as f:
+            bytes = f.read() # read entire file as bytes
+            readable_hash = hashlib.sha256(bytes).hexdigest()
+            print(readable_hash)
+        client_socket.send(readable_hash.encode('utf-8'))
+        #calulate CID and send
+        client_socket.close()
 
 def file_split(filename, n):
     file_list = []
@@ -82,9 +83,13 @@ def file_split(filename, n):
         with open(filename, "wb") as f:
             f.write(file_list[i])
 
+    os.remove(filename)
+    return
+
 def file_send(n, filehash, fileaddr):
     stx = StorageTx()
     mem = Mempool()
+    udp = UDPHandler()
     stx.add_input(filehash,fileaddr)
     for i in range(0,n):
         host = "rcv host"
@@ -114,10 +119,11 @@ def file_send(n, filehash, fileaddr):
         else:
             return "tx error"
         send.close()
+        os.remove(filename)
         
     stx.gen_tx_hash()
     mem.add_transaction(stx.to_json())
-    #stx.broadcast
+    udp.broadcastmessage(json.dumps(stx.to_json()))
 
 
         
