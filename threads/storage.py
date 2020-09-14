@@ -14,19 +14,19 @@ SERVER_PORT = settings.FILE_RECV_PORT
 BUFFER_SIZE = 1024
 SEPARATOR = "<SEPARATOR>"
 
-def start(self):
+def start():
     s = socket.socket()
     s.bind((SERVER_HOST, SERVER_PORT))
     s.listen(5)
     print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
-    t = threading.Thread(target=self.thread)
+    t = threading.Thread(target=thread(s))
     t.start()
-    t2 = threading.Thread(target=self.thread)
+    t2 = threading.Thread(target=thread(s))
     t2.start()
     t.join()
     t2.join()
 
-def thread(self):
+def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
     received = client_socket.recv(BUFFER_SIZE).decode()
