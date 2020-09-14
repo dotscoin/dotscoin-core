@@ -1,5 +1,4 @@
 import socket
-import tqdm
 import os
 import json
 import hashlib
@@ -12,7 +11,7 @@ host = "34.74.0.126"
 # the port, let's use 5001
 port = 5001
 # the name of file we want to send, make sure it exists
-filename = "/home/test.mp4"
+filename = "tests/test.mp4"
 # get the file size
 filesize = os.path.getsize(filename)
 
@@ -24,7 +23,7 @@ s.connect((host, port))
 print("[+] Connected.")
 
 # send the filename and filesize
-s.send(f"{filename}{SEPARATOR}{filesize}".encode())
+s.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}{SEPARATOR}{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode())
 
 # start sending the file
 # progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
