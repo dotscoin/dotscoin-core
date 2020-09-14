@@ -77,7 +77,7 @@ class UDPBroadcastReceiveServer():
         ''' Wait for a client '''
         try:
             # receive message from a client
-            data, client_address = self.sock.recvfrom(1024)
+                
             # handle client's request
 
             self.handle_request(data, client_address)
