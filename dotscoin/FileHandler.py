@@ -13,15 +13,15 @@ class FileHash:
 
     def get_hash(self):
        file_size= os.stat(self.filepath)
-       self.block_size= file_size/ self.parts
-       with open(self.filepath) as file:
+       self.block_size =int(file_size.st_size/self.parts)
+       with open(self.filepath,"rb") as file:
            chunk = file.read(self.block_size)
            while chunk:
                hash= hashlib.sha256()
                hash.update(chunk)
                self.hash.append(hash.hexdigest())
-
-       calculate_merkle_root(self.hash)
+               chunk = file.read(self.block_size)
+       self.calculate_merkle_root(self.hash)
 
     def encrypt_file(self,key, in_filename, out_filename=None, chunksize=64*1024):
 
@@ -67,8 +67,6 @@ class FileHash:
         
     def calculate_merkle_root(self, transactions=[]):
         new_tran = []
-        if len(transactions) == 0:
-            transactions = [tx.hash for tx in self.transactions]
         if len(transactions) > 1:
             if transactions[-1] == transactions[-2]:
                 return ""
