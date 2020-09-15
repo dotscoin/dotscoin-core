@@ -31,7 +31,7 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = client_socket.recv(BUFFER_SIZE).decode()
+    received = client_socket.recv(BUFFER_SIZE).decode('latin1')
     filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
     if filetype == "temp":
