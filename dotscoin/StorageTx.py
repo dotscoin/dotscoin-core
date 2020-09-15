@@ -13,19 +13,21 @@ class StorageTx:
     idf = "storage"
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
-    def add_input(self, hash, addr):
-        self.temp.append(hash)
+    def add_input(self, Hash, addr):
+        self.temp.append(Hash)
         inp = {
-            "file_hash" : hash,
+            "file_hash" : Hash,
             "sender_addr" : addr,
         }
         self.inputs.append(inp)
         return
     
-    def add_output(self, hash, addr, part_filename):
-        self.temp.append(hash)
+    def add_output(self, Hash, addr, part_filename):
+        print(Hash)
+        print(part_filename)
+        self.temp.append(Hash)
         out = {
-            "part_hash" : hash,
+            "part_hash" : Hash,
             "part_filename": part_filename,
             "storage_addr" : addr,
         }
