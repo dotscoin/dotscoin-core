@@ -22,9 +22,8 @@ class BlockChain:
     def get_block(self, index: int) -> Block:
         return Block.from_json(json.loads(self.redis_client.lindex("chain", index).decode("utf-8")))
 
-
-    def read_chain(self, index: int):
-        """ Reading the blockchain """
+    def get_length(self) -> int:
+        return self.redis_client.llen("chain")
 
     def flush_chain(self):
         self.redis_client.delete("chain")
