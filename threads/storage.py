@@ -3,6 +3,7 @@ import os
 import settings 
 import hashlib
 import math
+import redis
 import threading
 from dotscoin.StorageTx import StorageTx
 from dotscoin.Mempool import Mempool
