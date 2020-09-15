@@ -31,6 +31,7 @@ def thread(s):
     print(f"[+] {address} is connected.")
     received = client_socket.recv(BUFFER_SIZE).decode()
     filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
+    print(filetype)
     if filetype == "temp":
         filename = os.path.basename(settings.TEMP_STORAGE_PATH + filename)
     else:
@@ -56,11 +57,14 @@ def thread(s):
             return "storage failed"
         
     else:
+        print("try again")
         with open(filename,"rb") as f:
-            bytes = f.read() # read entire file as bytes
+            bytes = f.read()
+            print("calc hash") # read entire file as bytes
             readable_hash = hashlib.sha256(bytes).hexdigest()
             print(readable_hash)
         client_socket.send(readable_hash.encode('utf-8'))
+        print("hash sent")
         #calulate CID and send
         client_socket.close()
 
@@ -94,7 +98,7 @@ def file_send(n, filehash, fileaddr):
     recv_hosts = ['34.122.73.13', '104.196.106.117']
     for i in range(0,n):
         host = recv_hosts[i]
-        port = "5643"
+        port = 5643
 
         filename = settings.TEMP_STORAGE_PATH + "output" + str(i) + ".format"
         filesize = math.ceil(os.path.getsize(filename))
