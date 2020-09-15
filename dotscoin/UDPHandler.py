@@ -5,6 +5,8 @@ import json
 import settings
 import socket
 import redis
+import time
+from dotscoin.TimeServer import TimeServer
 
 class UDPHandler:
     def __init__(self):
@@ -17,7 +19,9 @@ class UDPHandler:
             "sendtransaction": self.sendtransaction,
             "sendblock": self.sendblock,
             "getallmtxhash": self.getallmtxhash,
-            "gettxbyhash": self.gettxbyhash
+            "gettxbyhash": self.gettxbyhash,
+            "synctime": self.synctime,
+            "gettime": self.gettime
         }
 
     @staticmethod
@@ -106,3 +110,22 @@ class UDPHandler:
         elif response is not None:
             mempool = Mempool()
             mempool.add_transaction(Transaction.from_json(json.loads(response)["tx"]))
+
+    def synctime(self, request=None, response=None):
+        if response is None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "synctime",
+                "timestamp": time.time()
+            }), request["ip_addr"], request["receiver_port"])
+        else:
+            raw = json.loads(response)
+            redis_client = redis.Redis(host='localhost', port=6379, db=0)
+            current_timestamp = time.time()
+            redis_client.set("delay_time", (current_timestamp - int(raw["timestamp"])) / 2)
+
+    def gettime(self, request=None, response=None):
+        ts = TimeServer()
+        if response is not None:
+            raw = json.loads(response)
+            redis_client = redis.Redis(host='localhost', port=6379, db=0)
+            ts.set_time(int(raw["timestamp"]) + int(redis_client.get("delay_time")))
