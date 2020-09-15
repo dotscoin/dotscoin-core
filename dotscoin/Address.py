@@ -1,11 +1,17 @@
-from typing import Any
-from ecdsa import VerifyingKey, SigningKey, BadSignatureError
+# all imports
 import hashlib
 import json
 import redis
+from typing import Any
+# ECDSA algo for key generation
+from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 
 class Address:
+    """Address class to generate the public addresses. Eg: address of this node"""
+    
     def __init__(self):
+        """ Initializations, generation of signing key and verifying key,
+        and connecting to the Redis database where everything is stored """
         self.sk = SigningKey.generate()
         self.vk = self.sk.verifying_key
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -20,6 +26,7 @@ class Address:
         return self.sk.sign(message)
 
     def verify_signature(self, message, signature) -> bool:
+        """ Returns True if the signature is verified else False """
         try:
             self.vk.verify(signature, message)
             return True
@@ -27,9 +34,12 @@ class Address:
             return False
 
     def display(self):
+        """ Function to display the verifying key """
         print(self.vk.to_string().hex())
 
     def get_public_address(self) -> str:
+        """ Final generation of public address by making us of
+        --> SHA256, ripemd160. Encoding method -> utf-8 """
         sha_hash_pk = hashlib.sha256(self.vk.to_string().hex().encode('utf-8')).hexdigest()
         h = hashlib.new('ripemd160')
         h.update(sha_hash_pk.encode('utf-8'))
@@ -37,12 +47,15 @@ class Address:
         return h.hexdigest()
 
     def export(self) -> dict:
+        """ Exports the signing key and verifying key """
         return {
             'vk': self.vk.to_pem().decode("utf-8"),
             'sk': self.sk.to_pem().decode("utf-8")
         }
 
     def total_value(self, addr):
+        """ This function scans the complete blockchain and returns
+        the total balance of an Address """
         i = 1
         total = 0
         while True:
@@ -52,12 +65,47 @@ class Address:
             for tx in block.txs:
                 for input in tx.inputs:
                     if input.address == addr:
+                        # adding up inputs
                         total = total + input.value
                 for out in tx.outputs:
                     if out.address == addr:
+                        # subtracting outputs
                         total = total - out.value
             i = i + 1
         return total
+
+    def get_transactions(self):
+        """ Returns all transactions associated to an address """
+        my_addr = self.get_public_address()
+        response = []
+        chain_length = self.redis_client.llen("chain")
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex("chain", chain_length - 1).decode("utf-8")))
+            for tx in block.transactions:
+                if len(tx.inputs) == 0:
+                    continue
+                if tx.inputs[0].address == my_addr:
+                    response.append(tx)
+            chain_length -= 1
+        return response
+
+    @staticmethod
+    def get_transactions_by_address(addr: str):
+        """ Static function to get all transactions of an address """
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        response = []
+        chain_length = redis_client.llen("chain")
+        while chain_length > 0:
+            block = Block.from_json(json.loads(redis_client.lindex("chain", chain_length - 1).decode("utf-8")))
+            for tx in block.transactions:
+                if len(tx.inputs) == 0:
+                    continue
+                if tx.inputs[0].address == addr:
+                    response.append(tx)
+            chain_length -= 1
+        return response
+
+    
 
 
 

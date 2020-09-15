@@ -2,7 +2,6 @@ from dotscoin.Address import Address
 import json
 import urllib.request
 
-
 class Vote:
     ip_address: str = ""
     verifying_key: str = ""

@@ -1,24 +1,24 @@
 import time
-from dotscoin.Transaction import Transaction
 import redis
 import hashlib
-from typing import List
 import json
-from collections import Set, Mapping, deque
 import sys
+from typing import List
+from dotscoin.Transaction import Transaction
+from collections import Set, Mapping, deque
 
 class Block:
-    previous_block_hash: str = ""
-    height: int = 0
-    size: int = 0
+    hash: str = ""
     timestamp = int(time.time())
+    transactions: List[Transaction] = []
+    previous_block_hash: str = ""
+    merkle_root: str = ""
+    height: int = 0
+    version: str = "0.0.1"
+    size: int = 0
 
-    def __init__(self):
-        self.hash: str = ""
-        self.transactions: List[Transaction] = []
+    def __init__(self): 
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        self.merkle_root: str = ""
-        self.version: str = "0.0.1"
         self.add_previous_block()
 
     def add_previous_block(self):
@@ -60,7 +60,6 @@ class Block:
     @staticmethod
     def from_json(data):
         tmp = Block()
-
         tmp.hash = data['hash']
         tmp.timestamp = data['timestamp']
         tmp.transactions = [Transaction.from_json(
@@ -70,7 +69,6 @@ class Block:
         tmp.height = data['height']
         tmp.version = data['version']
         tmp.size = data['size']
-
         return tmp
 
     def compute_hash(self):
@@ -85,27 +83,28 @@ class Block:
         }
 
         self.hash = hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
+        
 
-    def calculate_merkle_root(self, transactions=[]):
-        new_tran = []
-        if len(transactions) == 0:
-            transactions = [tx.hash for tx in self.transactions]
-        if len(transactions) > 1:
-            if transactions[-1] == transactions[-2]:
-                return ""
-        for i in range(0, len(transactions), 2):
-            h = hashlib.sha256()
-            if i+1 == len(transactions):
-                h.update(
-                    ((transactions[i]) + (transactions[i])).encode("UTF-8"))
-                new_tran.append(h.hexdigest())
+        def calculate_merkle_root(self, transactions=[]):
+            new_tran = []
+            if len(transactions) == 0:
+                transactions = [tx.hash for tx in self.transactions]
+            if len(transactions) > 1:
+                if transactions[-1] == transactions[-2]:
+                    return ""
+            for i in range(0, len(transactions), 2):
+                h = hashlib.sha256()
+                if i+1 == len(transactions):
+                    h.update(
+                        ((transactions[i]) + (transactions[i])).encode("UTF-8"))
+                    new_tran.append(h.hexdigest())
+                else:
+                    h.update(
+                        ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
+                    new_tran.append(h.hexdigest())
+
+            if len(new_tran) == 1:
+                self.merkle_root = new_tran[0]
+                return
             else:
-                h.update(
-                    ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
-                new_tran.append(h.hexdigest())
-
-        if len(new_tran) == 1:
-            self.merkle_root = new_tran[0]
-            return
-        else:
-            self.calculate_merkle_root(new_tran)
+                self.calculate_merkle_root(new_tran)

@@ -1,22 +1,20 @@
-from dotscoin.BlockChain import BlockChain
-from dotscoin.Block import Block
 import redis
 import json
+from dotscoin.BlockChain import BlockChain
+from dotscoin.Block import Block
 
 class Verification:
     def __init__(self):
         blockchain = BlockChain()
         self.block = Block()
-        self.redis_client = blockchain.redis_client
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.chain_length = self.redis_client.llen('chain')
 
     def verify_tx(self, transaction):
         inputs = transaction.inputs
         tx_verdict = "pending"
-
         for input in inputs:
             i = 0
-            # block = json.loads(self.redis_client.lindex('chain', -1).decode('utf-8'))
             while True:
                 flag = 0
                 block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
@@ -38,25 +36,15 @@ class Verification:
         tx_verdict = "verified"
         return tx_verdict
 
-        # index = -1
-        # while True:
-        #     block = json.loads(self.redis_client.lindex('chain', -1).decode('utf-8'))
-        #     for tx in block.txs:
-        #         if tx.hash == transaction.hash:
-        #             return False
-        #         for input in tx.inputs:
-        #             if input.prev_out.hash == transaction.input.prev_out.hash and input.prev_out.tx_index == transaction.input.prev_out.tx_index:
-
-
-
     def full_chain_verify(self):
         verify_message = "unverified"
         for i in range(0, self.chain_length):
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
-            v_merkl_root = self.block.calculate_merkle_root(block.txs)
-            if v_merkl_root != block.merkle_root: 
+            raw = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            block = Block.from_json(raw)
+            block.calculate_merkle_root()
+            v_merkl_root = block.merkle_root
+            if v_merkl_root != raw["merkle_root"]: 
                 verify_message = "failed"
-                self.del_from_faultblock(i)
         verify_message = "verified"
         return verify_message
     
@@ -64,8 +52,8 @@ class Verification:
         self.redis_client.ltrim(fault_index, self.chain_length)
         self.sync_chain()
 
-    def sync_chain(self):
-        pass
+    # def sync_chain(self):
+    #     pass
 
 
 
