@@ -16,7 +16,6 @@ class TransactionStatus(str, Enum):
 
 
 class Transaction:
-
     timestamp = time.time()
     version: str = "0.0.1"
     hash: str = ""
@@ -99,26 +98,3 @@ class Transaction:
                         return tx
             i = i + 1
         return None
-
-    @staticmethod
-    def get_all_txs_by_address(address: str) -> List[Transaction]:
-        """ Static function to get all transactions of an address """
-        redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        response: List[Transaction] = []
-        chain_length = redis_client.llen("chain")
-
-        while chain_length > 0:
-            block = json.loads(redis_client.lindex(
-                "chain", chain_length - 1).decode("utf-8"))
-            for tx in block["transactions"]:
-                if tx.inputs[0]["address"] == address:
-                    response.append(Transaction.from_json(tx))
-                    continue
-                for output in tx["outputs"]:
-                    if output["address"] == address:
-                        response.append(Transaction.from_json(tx))
-                        break
-
-            chain_length -= 1
-        
-        return response

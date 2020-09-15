@@ -18,6 +18,7 @@ class TestMempool(unittest.TestCase):
         mp.add_transaction(tx)
 
         self.assertEqual(mp.get_size(), 1)
+        mp.close()
 
     def test_remove_transaction(self):
         tx = Transaction()
@@ -32,6 +33,7 @@ class TestMempool(unittest.TestCase):
         self.assertEqual(mp.get_size(), 1)
         mp.remove_transaction(tx.hash)
         self.assertEqual(mp.get_size(), 0)
+        mp.close()
 
     def test_get_transaction(self):
         tx = Transaction()
@@ -44,6 +46,7 @@ class TestMempool(unittest.TestCase):
         mp.flush_mempool()
         mp.add_transaction(tx)
         self.assertEqual(mp.get_transaction().to_json(), tx.to_json())
+        mp.close()
 
 
 if __name__ == '__main__':

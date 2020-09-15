@@ -39,3 +39,9 @@ class Mempool:
     
     def flush_mempool(self):
         self.redis_client.delete("mempool")
+
+    def close(self): 
+        self.redis_client.close()
+
+    def __del__(self):
+        self.close()
