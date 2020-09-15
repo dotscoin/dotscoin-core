@@ -21,18 +21,21 @@ class Mempool:
         return True
 
     def get_transaction(self) -> Transaction:
-        return self.redis_client.rpop("mempool").decode("utf-8")
+        return Transaction.from_json(json.loads(self.redis_client.rpop("mempool").decode("utf-8")))
 
     def get_size(self) -> int:
         return self.redis_client.llen("mempool")
 
     def remove_transaction(self, hash):
-        i = 0
-        while True:
-            tx = self.redis_client.lindex('mempool', i).decode('utf-8')
+        length = self.redis_client.llen('mempool')
+        while length > 0:
+            raw = self.redis_client.lindex('mempool', length-1).decode('utf-8')
+            tx = json.loads(raw)
             if tx == None:
                 return
-            if tx.hash == hash:
-                self.redis_client.lrem('mempool', i)
-            i = i + 1
-        return
+            if tx["hash"] == hash:
+                self.redis_client.lrem('mempool', length, raw)
+            length -= 1
+    
+    def flush_mempool(self):
+        self.redis_client.delete("mempool")

@@ -7,10 +7,13 @@ from dotscoin.TransactionInput import TransactionInput
 from dotscoin.TransactionOutput import TransactionOutput
 from typing import List
 from dotscoin.Address import Address
+import redis
+
 
 class TransactionStatus(str, Enum):
     UNCONFIRMED = "Unconfirmed"
     CONFIRMED = "Confirmed"
+
 
 class Transaction:
 
@@ -19,8 +22,8 @@ class Transaction:
     hash: str = ""
     inputs: List[TransactionInput] = []
     outputs: List[TransactionOutput] = []
-    block = "Mempool" 
-    
+    block = "Mempool"
+
     def add_input(self, ti: TransactionInput):
         self.inputs.append(ti)
 
@@ -33,8 +36,10 @@ class Transaction:
         tmp.timestamp = data['timestamp']
         tmp.version = data['version']
         tmp.hash = data['hash']
-        tmp.inputs = [TransactionInput.from_json(input) for input in data['inputs']]
-        tmp.outputs = [TransactionOutput.from_json(output) for output in data['outputs']]
+        tmp.inputs = [TransactionInput.from_json(
+            input) for input in data['inputs']]
+        tmp.outputs = [TransactionOutput.from_json(
+            output) for output in data['outputs']]
         tmp.block = data['block']
         return tmp
 
@@ -62,48 +67,30 @@ class Transaction:
 
     def verify_signature(self, vk: VerifyingKey):
         try:
-            vk.verify(bytes.fromhex(self.signature), self.display().encode("utf-8"))
+            vk.verify(bytes.fromhex(self.signature),
+                      self.display().encode("utf-8"))
             return True
         except BadSignatureError:
             return False
-
-    def broadcast_transaction(self):
-        input_tx = [ input.to_json() for input in self.inputs]
-        output_tx= [ output.to_json() for output in self.outputs]
-        message = self.to_json()
-        return message
 
     def coinbase_transaction(self):
         if self.is_coinbase == True:
             self.input = []
 
     def verify_transaction(self):
-        for i,input in enumerate(self.input):
-            address=Address()
-            if address.verify_signature(input['prev_out']['script'],self.verifyingkey):
+        for i, input in enumerate(self.input):
+            address = Address()
+            if address.verify_signature(input['prev_out']['script'], self.verifyingkey):
                 continue
-            else: 
+            else:
                 return False
         return True
 
-    def txs_by_addr(self, addr):
-        i = 1
-        txs = []
-        while True:
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
-            if block == None:
-                return txs
-            else:
-                for tx in block.txs:
-                    if tx.inputs[0].address == addr:
-                        txs.append(tx)
-            i = i + 1
-        return txs
-    
     def tx_by_hash(self, hash):
         i = 1
         while True:
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
+            block = json.loads(self.redis_client.lindex(
+                'chain', i).decode('utf-8'))
             if block == None:
                 return None
             else:
@@ -112,4 +99,26 @@ class Transaction:
                         return tx
             i = i + 1
         return None
-              
+
+    @staticmethod
+    def get_all_txs_by_address(address: str) -> List[Transaction]:
+        """ Static function to get all transactions of an address """
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        response: List[Transaction] = []
+        chain_length = redis_client.llen("chain")
+
+        while chain_length > 0:
+            block = json.loads(redis_client.lindex(
+                "chain", chain_length - 1).decode("utf-8"))
+            for tx in block["transactions"]:
+                if tx.inputs[0]["address"] == address:
+                    response.append(Transaction.from_json(tx))
+                    continue
+                for output in tx["outputs"]:
+                    if output["address"] == address:
+                        response.append(Transaction.from_json(tx))
+                        break
+
+            chain_length -= 1
+        
+        return response
