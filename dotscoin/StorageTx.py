@@ -85,7 +85,7 @@ class StorageTx:
     # def retrieve_file(self, tx):
     #     file_list = []
     #     for out in tx.outputs:
-    #         #recv and store files through UDP commands
+    #         #recv and store files
     #         file_list.append()
     #     self.file_merge(file_list)
     #     return

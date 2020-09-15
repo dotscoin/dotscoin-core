@@ -100,7 +100,7 @@ def file_send(n, filehash, fileaddr, file_name):
         send.connect((host, port))
         print("[+] Connected.")
         
-        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}".encode())
+        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
             while True:
