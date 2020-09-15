@@ -31,7 +31,7 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = client_socket.recv(BUFFER_SIZE).decode('utf-8')
+    received = client_socket.recv(BUFFER_SIZE).decode('utf-32')
     filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
     print(fileaddr)
