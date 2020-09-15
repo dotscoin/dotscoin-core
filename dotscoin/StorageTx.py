@@ -9,6 +9,8 @@ class StorageTx:
     inputs = []
     outputs = []
     temp = []
+    idf = "storage"
+    self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def add_input(self, hash, addr):
         temp.append(hash)
@@ -26,6 +28,8 @@ class StorageTx:
             "part_filename" part_filename,
             "storage_addr" : addr,
         }
+        outputs.append(out)
+        return
 
     def gen_tx_hash(self, tmp = []):
         new_tran = []
@@ -57,5 +61,24 @@ class StorageTx:
             "block": self.block,
             "timestamp":self.timestamp,
             "inputs": self.inputs,
-            "outputs": self.outputs
+            "outputs": self.outputs,
+            "idf": self.idf
         }
+
+    def get_file(self, filehash):
+        i = 0
+        while True:
+            block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+            if block == None:
+                return "file not found"
+            for tx in block.txs:
+                if tx.idf == "storage":
+                    if tx.hash == filehash:
+                        #function to retrieve file
+                        self.retrieve_file(tx)
+                        return "found"
+            i = i + 1
+        return "some error occured"
+
+    def retrieve_file(self, tx):
+        pass
