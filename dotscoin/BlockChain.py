@@ -1,3 +1,4 @@
+# all imports
 import redis
 import json
 from typing import List
@@ -5,9 +6,14 @@ from dotscoin.Block import Block
 from dotscoin.Transaction import Transaction
 
 class BlockChain:
-    blocks: List[Block] = []
+    """ Object Initialization """
+
+    data = ""
 
     def __init__(self):
+        """ Initialization """
+
+        self.blocks: List[Block] = []
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         
     def add_block(self, blk: Block):
@@ -17,8 +23,8 @@ class BlockChain:
         return Block.from_json(json.loads(self.redis_client.lindex("chain", index).decode("utf-8")))
 
 
-    def get_length(self) -> int:
-        return self.redis_client.llen('chain')
+    def read_chain(self, index: int):
+        """ Reading the blockchain """
 
     def flush_chain(self):
         self.redis_client.delete("chain")

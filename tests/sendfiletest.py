@@ -32,7 +32,7 @@ info = {
  }
 
 # send the filename and filesize
-s.sendall(json.dumps(info).encode("utf-8"))
+s.sendall(pickle.dumps(info))
 # s.sendall(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}{SEPARATOR}{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode('utf-32'))
 
 # start sending the file

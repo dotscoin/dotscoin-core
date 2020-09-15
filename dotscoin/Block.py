@@ -1,3 +1,4 @@
+# all imports
 import time
 import redis
 import hashlib
@@ -8,6 +9,8 @@ from dotscoin.Transaction import Transaction
 from collections import Set, Mapping, deque
 
 class Block:
+
+    """ Iniialization/Object definition """
     hash: str = ""
     timestamp = int(time.time())
     transactions: List[Transaction] = []
@@ -18,19 +21,27 @@ class Block:
     size: int = 0
 
     def __init__(self): 
+        """ Initialization """
+
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.add_previous_block()
 
     def add_previous_block(self):
+        """ Connecting new block to previous block """
+
         raw = self.redis_client.lindex('chain', -1)
         if raw is not None and json.loads(raw.decode('utf-8')) is not None:
             self.previous_block_hash = json.loads(raw.decode("utf-8"))["hash"]
             self.height = int(json.loads(raw.decode("utf-8"))["height"])+ 1 
 
     def add_transaction(self, transaction: Transaction):
+        """ Adding a new transaction """
+
         self.transactions.append(transaction)
 
     def to_json(self):
+        """ Converting object to JSON """
+
         return {
             'hash': self.hash,
             'timestamp': self.timestamp,
@@ -41,7 +52,10 @@ class Block:
             'version': self.version,
             'size': self.size
         }
+
     def calcalute_block_size(self):
+        """ Calculating the size of the block """
+
         size = 0
         message={
             'hash': self.hash,
@@ -59,6 +73,8 @@ class Block:
 
     @staticmethod
     def from_json(data):
+        """ Mapping data from JSON to object """
+
         tmp = Block()
         tmp.hash = data['hash']
         tmp.timestamp = data['timestamp']
@@ -72,6 +88,8 @@ class Block:
         return tmp
 
     def compute_hash(self):
+        """ Computing hash of the block. Algo used --> SHA256 """
+
         message = {
             "timestamp": self.timestamp,
             "transactions": [tx.to_json() for tx in self.transactions],
@@ -83,28 +101,30 @@ class Block:
         }
 
         self.hash = hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
-        
 
-    def calculate_merkle_root(self, transactions=[]):
-        new_tran = []
-        if len(transactions) == 0:
-            transactions = [tx.hash for tx in self.transactions]
-        if len(transactions) > 1:
-            if transactions[-1] == transactions[-2]:
-                return ""
-        for i in range(0, len(transactions), 2):
-            h = hashlib.sha256()
-            if i+1 == len(transactions):
-                h.update(
-                    ((transactions[i]) + (transactions[i])).encode("UTF-8"))
-                new_tran.append(h.hexdigest())
+        def calculate_merkle_root(self, transactions=[]):
+            """ Calculating merkle root of the block """
+
+            new_tran = []
+            if len(transactions) == 0:
+                transactions = [tx.hash for tx in self.transactions]
+            if len(transactions) > 1:
+                if transactions[-1] == transactions[-2]:
+                    return ""
+            for i in range(0, len(transactions), 2):
+                h = hashlib.sha256()
+                if i+1 == len(transactions):
+                    h.update(
+                        ((transactions[i]) + (transactions[i])).encode("UTF-8"))
+                    new_tran.append(h.hexdigest())
+                else:
+                    h.update(
+                        ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
+                    new_tran.append(h.hexdigest())
+
+            if len(new_tran) == 1:
+                self.merkle_root = new_tran[0]
+                return
             else:
-                h.update(
-                    ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
-                new_tran.append(h.hexdigest())
-
-        if len(new_tran) == 1:
-            self.merkle_root = new_tran[0]
-            return
-        else:
-            self.calculate_merkle_root(new_tran)
+                # recursive call
+                self.calculate_merkle_root(new_tran)

@@ -5,10 +5,12 @@ import hashlib
 import math
 import redis
 import threading
+import json
+import pickle5 as pickle
 from dotscoin.StorageTx import StorageTx
 from dotscoin.Mempool import Mempool
 from dotscoin.UDPHandler import UDPHandler
-import json
+
 
 SERVER_HOST = settings.NODE_IP
 SERVER_PORT = settings.FILE_RECV_PORT
@@ -31,7 +33,7 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = json.loads(client_socket.recv(BUFFER_SIZE).decode('utf-8'))
+    received = pickle.loads(client_socket.recv(BUFFER_SIZE))
     filename = received.file_name
     filesize = received.filesize 
     filetype = received.filetype
@@ -117,7 +119,7 @@ def file_send(n, filehash, fileaddr, file_name):
             "fileaddr" : fileaddr,
         }
         # send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
-        send.send(json.dumps(info.encode('utf-8')))
+        send.send(pickle.dumps(info))
         filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
