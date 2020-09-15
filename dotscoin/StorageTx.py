@@ -66,7 +66,7 @@ class StorageTx:
             "idf": self.idf
         }
 
-    # FILE RETRIEVAL CODE
+    #FILE RETRIEVAL CODE
     # def get_file(self, filehash):
     #     i = 0
     #     while True:
