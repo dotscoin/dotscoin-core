@@ -19,10 +19,11 @@ class StorageTx:
         inputs.append(inp)
         return
     
-    def add_output(self, hash, addr):
+    def add_output(self, hash, addr, part_filename):
         temp.append(hash)
         out = {
             "part_hash" : hash,
+            "part_filename" part_filename,
             "storage_addr" : addr,
         }
 
