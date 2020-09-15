@@ -113,7 +113,7 @@ def file_send(n, filehash, fileaddr, file_name):
         os.remove(filename)
         
     stx.gen_tx_hash()
-    mem.add_transaction(stx.to_json())
+    mem.add_transaction(stx)
     # udp.broadcastmessage(json.dumps(stx.to_json()))
 
 def get_hash(filename, parts):
