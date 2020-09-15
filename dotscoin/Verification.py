@@ -52,9 +52,6 @@ class Verification:
         self.redis_client.ltrim(fault_index, self.chain_length)
         self.sync_chain()
 
-    # def sync_chain(self):
-    #     pass
-
 
 
 
