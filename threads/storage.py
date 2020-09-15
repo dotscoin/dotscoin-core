@@ -34,6 +34,7 @@ def thread(s):
     received = client_socket.recv(BUFFER_SIZE).decode('latin1')
     filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
+    print(fileaddr)
     if filetype == "temp":
         filename = os.path.basename(settings.TEMP_STORAGE_PATH + filename)
     else:
@@ -50,6 +51,7 @@ def thread(s):
     if filetype == "temp":
         # split and broadcast
         # No. of splits to be made --> n
+        print(fileaddr)
         file_split(filename,2)
         file_send(2, filehash, fileaddr, filename)
         client_socket.close()
@@ -105,6 +107,7 @@ def file_send(n, filehash, fileaddr, file_name):
         filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
+            print(filehash)
             while True:
                 bytes_read = f.read(BUFFER_SIZE)
                 if not bytes_read:
@@ -129,7 +132,8 @@ def get_hash(filename, parts):
             hash.update(chunk)
             hash_ar.append(hash.hexdigest())
             chunk = file.read(block_size)
-    return calculate_merkle_root(hash_ar)
+    hsh = calculate_merkle_root(hash_ar)
+    return hsh
 
 def calculate_merkle_root(transactions=[]):
     new_tran = []
@@ -150,4 +154,4 @@ def calculate_merkle_root(transactions=[]):
     if len(new_tran) == 1:
         return new_tran[0]
     else:
-        calculate_merkle_root(new_tran)
+        return calculate_merkle_root(new_tran)
