@@ -87,10 +87,11 @@ class StorageTx:
     #     for out in tx.outputs:
     #         #recv and store files
     #         file_list.append()
+    #     self.file_merge(file_list)
     #     return
 
     # def file_merge(file_list):
-    #     filename = "compiled.mkv"
+    #     filename = "compiled.format"
     #     fbl = []
     #     for file in file_list:
     #         filesize = os.path.getsize(file)
@@ -98,3 +99,7 @@ class StorageTx:
     #         with open(file, "rb") as f:
     #             bytes_read = f.read(filesize)
     #             fbl.append(bytes_read)
+
+    #     with open(filename, "wb") as fs:
+    #         for byt in fbl:
+    #             fs.write(byt)
