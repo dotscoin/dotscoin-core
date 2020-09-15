@@ -83,7 +83,7 @@ def file_split(filename, n):
 def file_send(n, filehash, fileaddr, file_name):
     stx = StorageTx()
     mem = Mempool()
-    udp = UDPHandler()
+    # udp = UDPHandler()
     stx.add_input(filehash,fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
     recv_hosts = ['15.207.11.83', '34.123.137.113']
