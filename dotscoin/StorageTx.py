@@ -14,22 +14,22 @@ class StorageTx:
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def add_input(self, hash, addr):
-        temp.append(hash)
+        self.temp.append(hash)
         inp = {
             "file_hash" : hash,
             "sender_addr" : addr,
         }
-        inputs.append(inp)
+        self.inputs.append(inp)
         return
     
     def add_output(self, hash, addr, part_filename):
-        temp.append(hash)
+        self.temp.append(hash)
         out = {
             "part_hash" : hash,
             "part_filename": part_filename,
             "storage_addr" : addr,
         }
-        outputs.append(out)
+        self.outputs.append(out)
         return
 
     def gen_tx_hash(self, tmp = []):
@@ -85,7 +85,7 @@ class StorageTx:
     # def retrieve_file(self, tx):
     #     file_list = []
     #     for out in tx.outputs:
-    #         #recv and store files
+    #         #recv and store files through UDP commands
     #         file_list.append()
     #     self.file_merge(file_list)
     #     return
