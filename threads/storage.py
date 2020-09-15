@@ -86,7 +86,7 @@ def file_send(n, filehash, fileaddr, file_name):
     # udp = UDPHandler()
     stx.add_input(filehash,fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
-    recv_hosts = ['34.122.73.13', '104.196.106.117']
+    recv_hosts = ['15.207.11.83', '34.123.137.113']
     for i in range(0,n):
         host = recv_hosts[i]
         port = 5001
@@ -100,7 +100,7 @@ def file_send(n, filehash, fileaddr, file_name):
         send.connect((host, port))
         print("[+] Connected.")
         
-        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}".encode())
+        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
             while True:
