@@ -31,7 +31,7 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = client_socket.recv(BUFFER_SIZE).decode()
+    received = client_socket.recv(BUFFER_SIZE).decode('latin1')
     filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
     if filetype == "temp":
@@ -83,7 +83,7 @@ def file_split(filename, n):
 def file_send(n, filehash, fileaddr, file_name):
     stx = StorageTx()
     mem = Mempool()
-    udp = UDPHandler()
+    # udp = UDPHandler()
     stx.add_input(filehash,fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
     recv_hosts = ['34.122.73.13', '104.196.106.117']
