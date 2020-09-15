@@ -85,26 +85,26 @@ class Block:
         self.hash = hashlib.sha256(json.dumps(message).encode("utf-8")).hexdigest()
         
 
-        def calculate_merkle_root(self, transactions=[]):
-            new_tran = []
-            if len(transactions) == 0:
-                transactions = [tx.hash for tx in self.transactions]
-            if len(transactions) > 1:
-                if transactions[-1] == transactions[-2]:
-                    return ""
-            for i in range(0, len(transactions), 2):
-                h = hashlib.sha256()
-                if i+1 == len(transactions):
-                    h.update(
-                        ((transactions[i]) + (transactions[i])).encode("UTF-8"))
-                    new_tran.append(h.hexdigest())
-                else:
-                    h.update(
-                        ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
-                    new_tran.append(h.hexdigest())
-
-            if len(new_tran) == 1:
-                self.merkle_root = new_tran[0]
-                return
+    def calculate_merkle_root(self, transactions=[]):
+        new_tran = []
+        if len(transactions) == 0:
+            transactions = [tx.hash for tx in self.transactions]
+        if len(transactions) > 1:
+            if transactions[-1] == transactions[-2]:
+                return ""
+        for i in range(0, len(transactions), 2):
+            h = hashlib.sha256()
+            if i+1 == len(transactions):
+                h.update(
+                    ((transactions[i]) + (transactions[i])).encode("UTF-8"))
+                new_tran.append(h.hexdigest())
             else:
-                self.calculate_merkle_root(new_tran)
+                h.update(
+                    ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
+                new_tran.append(h.hexdigest())
+
+        if len(new_tran) == 1:
+            self.merkle_root = new_tran[0]
+            return
+        else:
+            self.calculate_merkle_root(new_tran)

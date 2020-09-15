@@ -9,7 +9,7 @@ class TestMempool(unittest.TestCase):
     def test_add_transaction(self):
         tx = Transaction()
         input = TransactionInput()
-        input.address = ""
+        input.address = "test_address"
         tx.add_input(input)
         tx.generate_hash()
 
