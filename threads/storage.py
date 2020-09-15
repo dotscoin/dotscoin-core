@@ -55,18 +55,6 @@ def thread(s):
         client_socket.close()
         
     else:
-<<<<<<< HEAD
-        print("try again")
-        with open(filename,"rb") as f:
-            bytes = f.read()
-            print("calc hash") # read entire file as bytes
-            readable_hash = hashlib.sha256(bytes).hexdigest()
-            print(readable_hash)
-        client_socket.send(readable_hash.encode('utf-8'))
-        print("hash sent")
-        #calulate CID and send
-=======
->>>>>>> 5150a1131cd0ed684811cec7ff639c268f97f145
         client_socket.close()
 
 def file_split(filename, n):
