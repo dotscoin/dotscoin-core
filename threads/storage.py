@@ -84,7 +84,8 @@ def file_send(n, filehash, fileaddr, file_name):
     stx = StorageTx()
     mem = Mempool()
     # udp = UDPHandler()
-    stx.add_input(filehash,fileaddr)
+    print(fileaddr)
+    stx.add_input(filehash, fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
     recv_hosts = ['15.207.11.83', '34.123.137.113']
     for i in range(0,n):
@@ -101,6 +102,7 @@ def file_send(n, filehash, fileaddr, file_name):
         print("[+] Connected.")
         
         send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
+        filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
             while True:
@@ -108,7 +110,7 @@ def file_send(n, filehash, fileaddr, file_name):
                 if not bytes_read:
                     break
                 send.sendall(bytes_read)
-        stx.add_output(filehash, host, part_filename)
+        stx.add_output(filehash, host, filename)
         send.close()
         os.remove(filename)
         
