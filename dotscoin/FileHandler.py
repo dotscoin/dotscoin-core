@@ -3,6 +3,7 @@ import os, random, struct
 from Crypto.Cipher import AES
 from Crypto import Random
 import sys
+import math
 class FileHash:
     
     def __init__(self,path,parts):
@@ -14,7 +15,7 @@ class FileHash:
 
     def get_hash(self):
        file_size= os.stat(self.filepath)
-       self.block_size =int(file_size.st_size/self.parts)
+       self.block_size =math.ceil(file_size.st_size/self.parts)
        with open(self.filepath,"rb") as file:
            chunk = file.read(self.block_size)
            while chunk:

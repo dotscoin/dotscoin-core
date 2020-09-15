@@ -125,7 +125,6 @@ def add_block_nondel():
         events = dict(zpoll.poll(1))
         for key in events:
             block = json.loads(key.recv_string())
-            print(block)
             all_blocks.append(block)
             zsocket.send_string("got some block")
     zpoll.unregister(zsocket)
@@ -133,7 +132,6 @@ def add_block_nondel():
     context.destroy()
     # get most common and add to chain
     if len(all_blocks) > 0:
-        print(all_blocks)
         mr = []
         for blk in all_blocks:
             mr.append(blk.merkle_root)

@@ -1,5 +1,6 @@
 import json
 import time
+import redis
 import hashlib
 
 class StorageTx:
@@ -9,6 +10,8 @@ class StorageTx:
     inputs = []
     outputs = []
     temp = []
+    idf = "storage"
+    redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def add_input(self, hash, addr):
         temp.append(hash)
@@ -19,17 +22,20 @@ class StorageTx:
         inputs.append(inp)
         return
     
-    def add_output(self, hash, addr):
+    def add_output(self, hash, addr, part_filename):
         temp.append(hash)
         out = {
             "part_hash" : hash,
+            "part_filename": part_filename,
             "storage_addr" : addr,
         }
+        outputs.append(out)
+        return
 
     def gen_tx_hash(self, tmp = []):
         new_tran = []
         if len(tmp) == 0:
-            tmp = [hsh for hsh in temp]
+            tmp = [hsh for hsh in self.temp]
         if len(tmp) > 1:
             if tmp[-1] == tmp[-2]:
                 return ""
@@ -56,5 +62,39 @@ class StorageTx:
             "block": self.block,
             "timestamp":self.timestamp,
             "inputs": self.inputs,
-            "outputs": self.outputs
+            "outputs": self.outputs,
+            "idf": self.idf
         }
+
+    # FILE RETRIEVAL CODE
+    # def get_file(self, filehash):
+    #     i = 0
+    #     while True:
+    #         block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+    #         if block == None:
+    #             return "file not found"
+    #         for tx in block.txs:
+    #             if tx.idf == "storage":
+    #                 if tx.hash == filehash:
+    #                     #function to retrieve file
+    #                     self.retrieve_file(tx)
+    #                     return "found"
+    #         i = i + 1
+    #     return "some error occured"
+
+    # def retrieve_file(self, tx):
+    #     file_list = []
+    #     for out in tx.outputs:
+    #         #recv and store files
+    #         file_list.append()
+    #     return
+
+    # def file_merge(file_list):
+    #     filename = "compiled.mkv"
+    #     fbl = []
+    #     for file in file_list:
+    #         filesize = os.path.getsize(file)
+    #         # SPLIT_SIZE = math.ceil(filesize)
+    #         with open(file, "rb") as f:
+    #             bytes_read = f.read(filesize)
+    #             fbl.append(bytes_read)
