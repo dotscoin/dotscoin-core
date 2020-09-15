@@ -36,7 +36,6 @@ class Block:
 
     def add_transaction(self, transaction: Transaction):
         """ Adding a new transaction """
-
         self.transactions.append(transaction)
 
     def to_json(self):

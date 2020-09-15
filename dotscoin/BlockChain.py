@@ -17,16 +17,18 @@ class BlockChain:
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         
     def add_block(self, blk: Block):
-        self.redis_client.rpush('chain', json.dumps(blk.to_json()))
+        # print(json.dumps(blk.to_json()))
+        # print("----------")
+        self.redis_client.rpush('blockchain', json.dumps(blk.to_json()))
 
     def get_block(self, index: int) -> Block:
         return Block.from_json(json.loads(self.redis_client.lindex("chain", index).decode("utf-8")))
 
     def get_length(self) -> int:
-        return self.redis_client.llen("chain")
+        return self.redis_client.llen("blockchain")
 
     def flush_chain(self):
-        self.redis_client.delete("chain")
+        self.redis_client.delete("blockchain")
 
     def get_all_txs_by_address(self, address: str) -> List[Transaction]:
         """ Function to get all transactions of an address """
@@ -35,8 +37,6 @@ class BlockChain:
 
         while chain_length > 0:
             block = self.get_block(chain_length - 1)
-            print(block.to_json())
-            print("--------------")
             for tx in block.transactions:
                 if tx.inputs[0].address == address:
                     response.append(tx)
