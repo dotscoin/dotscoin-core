@@ -1,4 +1,5 @@
 class TransactionOutput:
+
     value = 0
     address= ""
     n = 0
@@ -13,9 +14,7 @@ class TransactionOutput:
     @staticmethod
     def from_json(data):
         tmp = TransactionOutput()
-
         tmp.n = data['n']
         tmp.address = data['address']
         tmp.value = data['value']
-
         return tmp

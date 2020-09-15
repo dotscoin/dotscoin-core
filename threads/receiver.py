@@ -10,15 +10,17 @@ import settings
 from dotscoin.Transaction import Transaction
 from dotscoin.Mempool import Mempool
 from dotscoin.Block import Block
+from dotscoin.UDPHandler import UDPHandler
 
 host = '0.0.0.0'
 port = settings.UDP_RECEIVER_PORT
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-sock.bind((host,port))
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind((host, port))
 INVALID_DATA=False
 
 def response_handler(data):
-    keys=['data','command']
+    keys=['body','command']
     INVALID_DATA =False
 
     for key in keys:
@@ -31,27 +33,27 @@ def response_handler(data):
         return json.dumps(response)
     else:
         print(data)
-        if data['command'] == "addtransaction":
-            tx = Transaction.from_json(data['data'])
-            mempool = Mempool()
-            mempool.add_transaction(tx)
-        elif data['command'] == "voteto":
-            context = zmq.Context()
-            z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
-            z3socket.send_string(json.dumps(data['data']))
-            message = z3socket.recv()
-            print("vote aaya")
-            z3socket.close()
-            context.destroy()
-        elif data['command'] == "addblock":
-            context = zmq.Context()
-            z3socket = context.socket(zmq.REQ)
-            z3socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
-            z3socket.send_string(json.dumps(data['data']))
-            message = z3socket.recv()
-            z3socket.close()
-            context.destroy()
+        if data['command'] == "sendtransaction":
+            udp_handler=UDPHandler()
+            udp_handler.sendtransaction(data)
+        elif data['command'] == "castvote":
+            udp_handler=UDPHandler()
+            udp_handler.castvote(data)
+        elif data['command'] == "sendblock":
+            udp_handler=UDPHandler()
+            udp_handler.sendblock(data)
+        elif data['command'] == "getblockbyheight":
+            udp_handler=UDPHandler()
+            udp_handler.getblockbyheight(data)
+        elif data['command'] == "getmempoollength":
+            udp_handler=UDPHandler()
+            udp_handler.getmempoollength(data)
+        elif data['command'] == "gettxbymindex":
+            udp_handler=UDPHandler()
+            udp_handler.gettxbymindex(data)
+        elif data['command'] == "getchainlength":
+            udp_handler=UDPHandler()
+            udp_handler.getchainlength(data)   
         response = {
         "message":"ok"
         }
@@ -75,7 +77,7 @@ class UDPBroadcastReceiveServer():
         ''' Wait for a client '''
         try:
             # receive message from a client
-            data, client_address = self.sock.recvfrom(1024)
+                
             # handle client's request
 
             self.handle_request(data, client_address)
@@ -99,7 +101,6 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         data = data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
-        print("hi")
         response = response_handler(json.loads(data))
 
         # send response to the client
