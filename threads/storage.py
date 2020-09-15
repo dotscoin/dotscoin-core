@@ -31,8 +31,10 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = client_socket.recv(BUFFER_SIZE).decode('latin1')
-    filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
+    received1 = client_socket.recv(BUFFER_SIZE).decode('utf-8')
+    filename, filesize, filetype = received1.split(SEPARATOR)
+    received2 = client_socket.recv(BUFFER_SIZE).decode('utf-8')
+    filehash, fileaddr = received2.split(SEPARATOR)
     print(filetype)
     print(fileaddr)
     if filetype == "temp":
@@ -103,7 +105,8 @@ def file_send(n, filehash, fileaddr, file_name):
         send.connect((host, port))
         print("[+] Connected.")
         
-        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
+        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}".encode())
+        send.send(f"{filehash}{SEPARATOR}{fileaddr}".encode())
         filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)

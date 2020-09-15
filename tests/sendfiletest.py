@@ -23,8 +23,8 @@ s.connect((host, port))
 print("[+] Connected.")
 
 # send the filename and filesize
-s.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}{SEPARATOR}{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode())
-
+s.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}".encode())
+s.send(f"{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode())
 # start sending the file
 # progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(filename, "rb") as f:
