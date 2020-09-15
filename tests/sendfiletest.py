@@ -22,8 +22,18 @@ print(f"[+] Connecting to {host}:{port}")
 s.connect((host, port))
 print("[+] Connected.")
 
+# json object
+info = {
+    "filename" : filename,
+    "filesize" : filesize,
+    "filetype" : "temp",
+    "filehash" : "fxsrysyws55ws57e",
+    "fileaddr" : "104.196.106.117",
+ }
+
 # send the filename and filesize
-s.sendall(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}{SEPARATOR}{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode('utf-32'))
+s.sendall(json.dumps(info).encode("utf-8"))
+# s.sendall(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{'temp'}{SEPARATOR}{'fxsrysyws55ws57e'}{SEPARATOR}{'104.196.106.117'}".encode('utf-32'))
 
 # start sending the file
 # progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)

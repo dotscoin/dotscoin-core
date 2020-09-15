@@ -69,39 +69,40 @@ class StorageTx:
         }
 
     #FILE RETRIEVAL CODE
-    # def get_file(self, filehash):
-    #     i = 0
-    #     while True:
-    #         block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
-    #         if block == None:
-    #             return "file not found"
-    #         for tx in block.txs:
-    #             if tx.idf == "storage":
-    #                 if tx.hash == filehash:
-    #                     #function to retrieve file
-    #                     self.retrieve_file(tx)
-    #                     return "found"
-    #         i = i + 1
-    #     return "some error occured"
+    def get_file(self, filehash):
+        i = 0
+        while True:
+            block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+            if block == None:
+                return "file not found"
+            for tx in block.txs:
+                if tx.idf == "storage":
+                    if tx.hash == filehash:
+                        #function to retrieve file
+                        self.retrieve_file(tx)
+                        #send file
+                        return "found"
+            i = i + 1
+        return "some error occured"
 
-    # def retrieve_file(self, tx):
-    #     file_list = []
-    #     for out in tx.outputs:
-    #         #recv and store files
-    #         file_list.append()
-    #     self.file_merge(file_list)
-    #     return
+    def retrieve_file(self, tx):
+        file_list = []
+        for out in tx.outputs:
+            #recv and store files
+            file_list.append()
+        self.file_merge(file_list)
+        return
 
-    # def file_merge(file_list):
-    #     filename = "compiled.format"
-    #     fbl = []
-    #     for file in file_list:
-    #         filesize = os.path.getsize(file)
-    #         # SPLIT_SIZE = math.ceil(filesize)
-    #         with open(file, "rb") as f:
-    #             bytes_read = f.read(filesize)
-    #             fbl.append(bytes_read)
+    def file_merge(file_list):
+        filename = "compiled/retreived.format"
+        fbl = []
+        for file in file_list:
+            filesize = os.path.getsize(file)
+            # SPLIT_SIZE = math.ceil(filesize)
+            with open(file, "rb") as f:
+                bytes_read = f.read(filesize)
+                fbl.append(bytes_read)
 
-    #     with open(filename, "wb") as fs:
-    #         for byt in fbl:
-    #             fs.write(byt)
+        with open(filename, "wb") as fs:
+            for byt in fbl:
+                fs.write(byt)

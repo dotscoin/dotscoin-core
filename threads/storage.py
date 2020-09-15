@@ -31,8 +31,14 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = client_socket.recv(BUFFER_SIZE).decode('utf-32')
-    filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
+    received = json.loads(client_socket.recv(BUFFER_SIZE).decode('utf-8'))
+    filename = received.file_name
+    filesize = received.filesize 
+    filetype = received.filetype
+    filehash = received.filehash
+    fileaddr = received.fileaddr
+
+    # filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
     print(fileaddr)
     if filetype == "temp":
@@ -103,7 +109,15 @@ def file_send(n, filehash, fileaddr, file_name):
         send.connect((host, port))
         print("[+] Connected.")
         
-        send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
+        info = {
+            "filename" : filename,
+            "filesize" : filesize,
+            "filetype" : filetype,
+            "filehash" : filehash,
+            "fileaddr" : fileaddr,
+        }
+        # send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
+        send.send(json.dumps(info.encode('utf-8')))
         filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
