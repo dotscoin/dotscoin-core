@@ -2,6 +2,7 @@ import redis
 import json
 from dotscoin.BlockChain import BlockChain
 from dotscoin.Block import Block
+from dotscoin.StorageTx import StorageTx
 
 class Verification:
     def __init__(self):
@@ -13,28 +14,46 @@ class Verification:
     def verify_tx(self, transaction):
         inputs = transaction.inputs
         tx_verdict = "pending"
-        for input in inputs:
-            i = 0
-            while True:
-                flag = 0
-                block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
-                if block == None:
-                    tx_verdict = "verified"
-                    return tx_verdict
-                for tx in block.txs:
-                    if tx.hash == input.previous_tx:
-                        flag = 1
-                        continue
-                    for inp in tx.inputs:
-                        if input.previous_tx == inp.previous_tx and input.index == inp.index :
-                            tx_verdict = "rejected"
-                            return tx_verdict
-                if flag == 1:
-                    break
-                i = i + 1
-        
-        tx_verdict = "verified"
-        return tx_verdict
+
+        if transaction.idf == "storage": 
+            temp = []
+            stx = StorageTx()
+            temp.append(transaction.inputs[0].file_hash)
+            for out in transaction.outputs:
+                #check (out.part_filename, storage_addr)
+                #ask for part file and verify part hash
+                temp.append(out.part_hash)
+            stx.gen_tx_hash(temp)
+            chash = stx.hash
+
+            if chash == transaction.hash:
+                return "transaction verified"
+            else:
+                return "transaction unverified"
+            
+        else: 
+            for input in inputs:
+                i = 0
+                while True:
+                    flag = 0
+                    block = json.loads(self.redis_client.lindex('chain', -1-i).decode('utf-8'))
+                    if block == None:
+                        tx_verdict = "verified"
+                        return tx_verdict
+                    for tx in block.txs:
+                        if tx.hash == input.previous_tx:
+                            flag = 1
+                            continue
+                        for inp in tx.inputs:
+                            if input.previous_tx == inp.previous_tx and input.index == inp.index :
+                                tx_verdict = "rejected"
+                                return tx_verdict
+                    if flag == 1:
+                        break
+                    i = i + 1
+            
+            tx_verdict = "verified"
+            return tx_verdict
 
     def full_chain_verify(self):
         verify_message = "unverified"

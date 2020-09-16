@@ -1,3 +1,4 @@
+import os
 import json
 import time
 import redis
@@ -93,7 +94,7 @@ class StorageTx:
         self.file_merge(file_list)
         return
 
-    def file_merge(file_list):
+    def file_merge(self, file_list):
         filename = "compiled/retreived.format"
         fbl = []
         for file in file_list:

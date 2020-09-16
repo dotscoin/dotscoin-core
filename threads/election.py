@@ -63,11 +63,14 @@ def mining():
     elec = Election()
     if elec.redis_client.llen("mempool") == 0:
         return
+
+    # Transaction verification 
     blk = Block()
     for i in range(0, elec.redis_client.llen("mempool")):
         tx = elec.redis_client.lindex('mempool', i).decode('utf-8')
         if tx == None:
-            continue
+            # check
+            break
         verify_verdict = elec.verification.verify_tx(tx)
         if verify_verdict == "verified":
             # Sending data to block
@@ -87,31 +90,20 @@ def mining():
     if full_verify_message == "verified":
         # braodcast the block you made
         UDPHandler.broadcastmessage({'data': block, 'command': 'addblock'})
-        # context = zmq.Context()
-        # z4socket = context.socket(zmq.REQ)
-        # z4socket.connect("tcp://127.0.0.1:%s" %
-        #                     settings.BROADCAST_ZMQ_PORT)
-        # z4socket.send_string(json.dumps(
-        #     {'data': block, 'command': 'addblock'}))
-        # message = z4socket.recv()
-        # z4socket.close()
     else:
         return
-
 
 def electionworker():
     elec = Election()
     elec.get_node_addr()
     dels = worker()
-    print("yes")
+    print(dels)
     is_del = False
     if dels.count(elec.this_node_addr) > 0:
         is_del = True
         mining()
     if is_del == False:
-        pass
-        # full_verify_message = Election.verification.full_chain_verify()
-
+        add_block_nondel()
 
 def add_block_nondel():
     context = zmq.Context()
@@ -141,9 +133,9 @@ def add_block_nondel():
         blkc.add_block(Mblock)
 
 
-def mining():
-    vf = Verification()
-    print(vf.full_chain_verify())
+# def mining():
+#     vf = Verification()
+#     print(vf.full_chain_verify())
 
 
 def run_thread():
