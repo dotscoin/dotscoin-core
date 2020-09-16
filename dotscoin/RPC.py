@@ -3,6 +3,7 @@ import redis
 from dotscoin.Mempool import Mempool
 from dotscoin.Transaction import Transaction
 from dotscoin.Address import Address
+from dotscoin.BlockChain import BlockChain
 
 class RPC:
     #check for type of data sent
@@ -16,7 +17,9 @@ class RPC:
             'gettxbyhash': self.gettxbyhash,
             'getnodeinfo': self.getnodeinfo,
             'getstakes': self.getstakes,
-            'gettxsbyaddress': self.gettxsbyaddress
+            'gettxsbyaddress': self.gettxsbyaddress,
+            'ping': self.pingpong,
+            "getchainlength": self.getchainlength
         }
 
     def handlecommand(self, data):
@@ -45,18 +48,25 @@ class RPC:
         return self.redis_client.lindex('chain', -1).decode("utf-8")
 
     def getaddressbalance(self, data=None):
-        addr = Address()
-        return addr.total_value(data["parameters"])
+        blkc = BlockChain()
+        balance = blkc.final_addr_balance(data)
+        blkc.close()
+        return json.dumps({
+            "balance": balance
+        })
     
     def getblockbyheight(self, data=None):
         return self.redis_client.lindex('chain', data["parameters"]).decode("utf-8")
     
     def gettxsbyaddress(self, data=None):
-        tran = Transaction()
-        return tran.txs_by_addr(data["parameters"])
+        blkc = BlockChain()
+        txs = [tx.to_json() for tx in blkc.get_txs_by_addr(data)]
+        return json.dumps({
+            "txs": txs
+        })
     
     def getnodeinfo(self, data=None):
-        with open("this_node_data.json", 'r') as json_file:
+        with open("node_data.json", 'r') as json_file:
             my_node = json.load(json_file)
         return json.dumps(my_node)
 
@@ -70,10 +80,12 @@ class RPC:
         tran = Transaction()
         return tran.tx_by_hash(data["parameters"])
 
-    def gettxsbyaddress(self, data=None):
-        txs = Address.get_transactions_by_address(data["parameters"])
-
+    def pingpong(self, data=None):
         return json.dumps({
-            "txs": txs
+            "reply": "pong"
         })
         
+    def getchainlength(self, data=None):
+        return json.dumps({
+            "length": self.redis_client.llen("chain")
+        })

@@ -30,25 +30,47 @@ class BlockChain:
     def flush_chain(self):
         self.redis_client.delete("blockchain")
 
-    def get_all_txs_by_address(self, address: str) -> List[Transaction]:
-        """ Function to get all transactions of an address """
-        response: List[Transaction] = []
-        chain_length = self.get_length()
-
+    def final_addr_balance(self, addr):
+        """ This function scans the complete blockchain and returns
+        the total balance of an Address """
+        chain_length = self.redis_client.llen('chain')
+        total = 0
+        used_transactions = set()
         while chain_length > 0:
-            block = self.get_block(chain_length - 1)
+            block = Block.from_json(json.loads(self.redis_client.lindex('chain', chain_length - 1).decode('utf-8')))
             for tx in block.transactions:
-                if tx.inputs[0].address == address:
-                    response.append(tx)
-                    continue
-                for output in tx.outputs:
-                    if output.address == address:
-                        response.append(tx)
-                        break
-
+                for inp in tx.inputs:
+                    if inp.address == addr:
+                        used_transactions.add((inp.previous_tx, inp.index))
+                for out_index, out in enumerate(tx.outputs):
+                    if tx.hash not in used_transactions:
+                        if out.address == addr:
+                            total = total + out.value
+                    else:
+                        if out.address == addr and (tx.hash, out_index) not in used_transactions:
+                            total = total + out.value
             chain_length -= 1
 
-        return response
+        return total
+
+    def get_txs_by_addr(self, addr) -> List[Transaction]:
+        txs = []
+        chain_length = self.redis_client.llen('chain')
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex('chain', chain_length - 1).decode('utf-8')))
+            for tx in block.transactions:
+                inp_adresses = [inp.address for inp in tx.inputs]
+                if addr in inp_adresses:
+                    txs.append(tx)
+                    continue
+                out_adresses = [out.address for out in tx.outputs]
+                if addr in out_adresses:
+                    txs.append(tx)
+                    continue
+            chain_length -= 1
+
+        return txs
+
 
     def close(self):
         self.redis_client.close()

@@ -41,20 +41,19 @@ class UDPHandler:
         udpsock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udpsock.bind((host,port))
-        i = 0
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        total_length = redis_client.llen("nodes")
-        while i < total_length:
-            node = redis_client.lindex('nodes', i).decode('utf-8')
-            udpsock.sendto(message.encode('utf-8'),(node.ip_addr, node.receiver_port))
-            i = i + 1
+        for ip_addr, raw_data in redis_client.hgetall("nodes_map"):
+            data = json.loads(raw_data)
+            print(data)
+            udpsock.sendto(message.encode('utf-8'),(ip_addr, data["receiver_port"]))
         udpsock.close()
     
     def castvote(self,data):
        pass
     
     def getchainlength(self,data):
-        return
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        return redis_client.llen("chain")
 
     def getblockbyheight(self,data):
         return

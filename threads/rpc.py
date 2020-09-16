@@ -13,7 +13,7 @@ import socketserver
 import threading
 import zmq
 import settings
-from include.bottle import route, run, template, get, post, request, response
+from include.bottle import route, run, template, get, post, request, response, hook
 import wsgiserver
 from include import bottle
 host = '0.0.0.0'
@@ -26,16 +26,16 @@ def response_handler(data):
 
     return response
 
+@hook('after_request')
+def enable_cors():
+    response.headers['Content-Type'] = 'application/json'
 
 @post('/')
 def posting_handler():
     data = request.json
     if "command" not in data.keys():
         return {"status": "rejected"}
-    if "data" not in data.keys():
-        return {"status": "rejected"}
-    response_handler(data)
-    return {"status": "ok"}
+    return response_handler(data)
 
 
 def rpc_receive():

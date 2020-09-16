@@ -58,27 +58,6 @@ class Address:
             'sk': self.sk.to_pem().decode("utf-8")
         }
 
-    def total_value(self, addr):
-        """ This function scans the complete blockchain and returns
-        the total balance of an Address """
-        i = 1
-        total = 0
-        while True:
-            block = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
-            if block == None:
-                return total
-            for tx in block.txs:
-                for input in tx.inputs:
-                    if input.address == addr:
-                        # adding up inputs
-                        total = total + input.value
-                for out in tx.outputs:
-                    if out.address == addr:
-                        # subtracting outputs
-                        total = total - out.value
-            i = i + 1
-        return total
-
     # Mnemonic generation section
     def gen_words(self):
         words = self.mnemo.generate(strength=128)

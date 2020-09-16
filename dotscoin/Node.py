@@ -49,7 +49,7 @@ class Node:
                 result = json.loads(raw.decode("utf-8"))
                 for value in result["nodes"]:
                     pipe.hset(
-                        "nodes_map", value["ip_addr"], value["node_addr"])
+                        "nodes_map", value["ip_addr"], json.dumps(value))
         pipe.execute()
         redis_client.close()
 
