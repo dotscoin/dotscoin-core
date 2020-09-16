@@ -10,3 +10,4 @@ NODE_IP="0.0.0.0"
 
 STORAGE_PATH=""
 TEMP_STORAGE_PATH=""
+DNS_SERVERS=["http://dns.dotscoin.com"]
