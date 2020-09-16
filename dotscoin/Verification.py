@@ -18,6 +18,7 @@ class Verification:
         if transaction.idf == "storage": 
             temp = []
             stx = StorageTx()
+            temp.append(transaction.timestamp)
             temp.append(transaction.inputs[0].file_hash)
             for out in transaction.outputs:
                 #check (out.part_filename, storage_addr)

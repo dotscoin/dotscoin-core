@@ -11,6 +11,7 @@ class StorageTx:
     inputs = []
     outputs = []
     temp = []
+    temp.append(timestamp)
     idf = "storage"
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
