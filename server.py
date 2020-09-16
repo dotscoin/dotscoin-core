@@ -74,22 +74,6 @@ def run_threads():
 def node_start():
     node = Node()
     cpu_count()
-    with open("this_node_data.json", 'r') as json_file:
-        my_node = json.load(json_file)
-    if my_node == {}:
-        response = urllib.request.urlopen("https://checkip.amazonaws.com/").read()
-        self_ip_addr = response.decode("utf-8").strip()
-        add = Address()
-        my_node = {
-            "node_addr": add.get_public_address(),
-            "ip_addr": self_ip_addr, 
-            "receiver_port": settings.UDP_RECEIVER_PORT,
-            "rpc_port": settings.RPC_PORT,
-        }
-        with open("this_node_data.json", 'w') as out_file:
-            out_file.write(json.dumps(my_node))
-    else:
-        pass
     run_threads()
     
 if __name__ == '__main__':
