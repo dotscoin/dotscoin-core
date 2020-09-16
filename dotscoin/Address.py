@@ -1,10 +1,14 @@
 # all imports
+import os
 import hashlib
 import json
 import redis
 from typing import Any
+from mnemonic import Mnemonic
 # ECDSA algo for key generation
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
+from ecdsa import NIST384p
+from ecdsa.util import randrange_from_seed__trytryagain
 
 class Address:
     """Address class to generate the public addresses. Eg: address of this node"""
@@ -12,6 +16,7 @@ class Address:
     def __init__(self):
         """ Initializations, generation of signing key and verifying key,
         and connecting to the Redis database where everything is stored """
+        self.mnemo = Mnemonic("english")
         self.sk = SigningKey.generate()
         self.vk = self.sk.verifying_key
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -74,6 +79,21 @@ class Address:
             i = i + 1
         return total
 
+    # Mnemonic generation section
+    def gen_words(self):
+        words = self.mnemo.generate(strength=128)
+        return words
+
+    def gen_seed(self, words, passphrase=""):
+        seed = self.mnemo.to_seed(words, passphrase="")
+        return seed
+    
+    def make_Skey(self, seed):
+        secexp = randrange_from_seed__trytryagain(seed, NIST384p.order)
+        return SigningKey.from_secret_exponent(secexp, curve=NIST384p)
+
+    def make_Vkey(self, Skey):
+        return Skey.verifying_key
     
 
 
