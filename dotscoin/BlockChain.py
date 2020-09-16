@@ -1,7 +1,7 @@
 # all imports
 import redis
 import json
-from typing import List
+from typing import List, Tuple
 from dotscoin.Block import Block
 from dotscoin.Transaction import Transaction
 
@@ -70,6 +70,27 @@ class BlockChain:
             chain_length -= 1
 
         return txs
+
+    def get_utxos_by_addr(self, addr) -> List[Tuple[str, int, float]]:
+        utxos = []
+        chain_length = self.redis_client.llen('chain')
+        used_transactions = set()
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex('chain', chain_length - 1).decode('utf-8')))
+            for tx in block.transactions:
+                for inp in tx.inputs:
+                    if inp.address == addr:
+                        used_transactions.add((inp.previous_tx, inp.index))
+                for out_index, out in enumerate(tx.outputs):
+                    if tx.hash not in used_transactions:
+                        if out.address == addr:
+                            utxos.append((tx.hash, out_index, out.value))
+                    else:
+                        if out.address == addr and (tx.hash, out_index) not in used_transactions:
+                            utxos.append((tx.hash, out_index, out.value))
+            chain_length -= 1
+
+        return utxos
 
 
     def close(self):
