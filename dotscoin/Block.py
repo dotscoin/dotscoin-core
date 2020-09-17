@@ -10,19 +10,18 @@ from collections import Set, Mapping, deque
 
 class Block:
 
-    """ Iniialization/Object definition """
-    hash: str = ""
-    timestamp = int(time.time())
-    transactions: List[Transaction] = []
-    previous_block_hash: str = ""
-    merkle_root: str = ""
-    height: int = 0
-    version: str = "0.0.1"
-    size: int = 0
-
     def __init__(self): 
         """ Initialization """
+        """ Iniialization/Object definition """
 
+        self.hash: str = ""
+        self.timestamp = int(time.time())
+        self.transactions: List[Transaction] = []
+        self.previous_block_hash: str = ""
+        self.merkle_root: str = ""
+        self.height: int = 0
+        self.version: str = "0.0.1"
+        self.size: int = 0
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.add_previous_block()
 

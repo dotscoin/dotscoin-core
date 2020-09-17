@@ -8,11 +8,10 @@ from dotscoin.Transaction import Transaction
 class BlockChain:
     """ Object Initialization """
 
-    data = ""
-
     def __init__(self):
         """ Initialization """
 
+        self.data = ""
         self.blocks: List[Block] = []
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         

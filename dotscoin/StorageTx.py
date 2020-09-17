@@ -5,15 +5,17 @@ import redis
 import hashlib
 
 class StorageTx:
-    hash: str = ""
-    block = "Mempool" 
-    timestamp = time.time()
-    inputs = []
-    outputs = []
-    temp = []
-    temp.append(timestamp)
-    idf = "storage"
-    redis_client = redis.Redis(host='localhost', port=6379, db=0)
+
+    def __init__(self):
+        self.hash: str = ""
+        self.block = "Mempool" 
+        self.timestamp = time.time()
+        self.inputs = []
+        self.outputs = []
+        self.temp = []
+        self.temp.append(timestamp)
+        self.idf = "storage"
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def add_input(self, Hash, addr):
         self.temp.append(Hash)
