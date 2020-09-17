@@ -12,7 +12,7 @@ class TestUdp():
         udpsock.sendto(json.dumps({
                  "command": "ping",
                  "body": {}
-             }).encode('utf-8'), ("0.0.0.0", 6500))
+             }).encode('utf-8'), ("34.68.253.117", 6500))
         udpsock.close()
 
 if __name__ == '__main__':
