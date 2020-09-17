@@ -102,7 +102,11 @@ description: >-
       <td style="text-align:left">This command returns the list of the transaction hashes in the mempool.</td>
       <td
       style="text-align:left"></td>
-        <td style="text-align:left"></td>
+        <td style="text-align:left">
+          <p>{</p>
+          <p>&quot;txs&quot;: Array&lt;string&gt;</p>
+          <p>}</p>
+        </td>
     </tr>
     <tr>
       <td style="text-align:left">gettxbyhash</td>
@@ -113,7 +117,11 @@ description: >-
         <p>&quot;hash&quot;: &lt;string&gt;</p>
         <p>}</p>
       </td>
-      <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;tx&quot;: &lt;Transaction&gt;</p>
+        <p>}</p>
+      </td>
     </tr>
     <tr>
       <td style="text-align:left">ping</td>
