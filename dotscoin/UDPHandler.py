@@ -7,6 +7,7 @@ import socket
 import redis
 import time
 from dotscoin.TimeServer import TimeServer
+from utils import decode_redis
 
 
 class UDPHandler:
@@ -53,9 +54,9 @@ class UDPHandler:
         udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udpsock.bind((host, port))
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        for ip_addr, raw_data in redis_client.hgetall("nodes_map"):
+        redis_data = decode_redis(redis_client.hgetall("nodes_map"))
+        for ip_addr, raw_data in redis_data.items():
             data = json.loads(raw_data)
-            print(data)
             udpsock.sendto(message.encode('utf-8'),
                            (ip_addr, data["receiver_port"]))
         udpsock.close()
@@ -92,9 +93,15 @@ class UDPHandler:
         mm = Mempool()
         return mm.get_tx_by_mindex(data["body"].index)
 
-    def sendtransaction(self, data):
-        tx = Transaction.from_json(data['body'])
-        UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+    def sendtransaction(self, request=None, response=None):
+        if request is not None:
+            tx = Transaction.from_json(data['body'])
+            UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+        if response is not None:
+            mm = Mempool()
+            tx = Transaction.from_json(data["tx"])
+            mm.add_transaction(tx)
+            mm.close()
 
     def sendblock(self, data):
         UDPHandler.broadcastmessage(json.dumps({

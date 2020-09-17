@@ -42,17 +42,17 @@ class Transaction:
         tmp.outputs = [TransactionOutput.from_json(
             output) for output in data['outputs']]
         tmp.block = data['block']
+
         return tmp
 
     def to_json(self):
-        return {
-            'timestamp': self.timestamp,
-            'version': self.version,
-            'hash': self.hash,
-            'inputs': [TransactionInput.to_json(input) for input in self.inputs],
-            'outputs': [TransactionOutput.to_json(output) for output in self.outputs],
-            'block': self.block
-        }
+        return {'timestamp': self.timestamp,
+                'version': self.version,
+                'hash': self.hash,
+                'inputs': [TransactionInput.to_json(input) for input in self.inputs],
+                'outputs': [TransactionOutput.to_json(output) for output in self.outputs],
+                'block': self.block
+                }
 
     def generate_hash(self):
         message = {

@@ -10,3 +10,19 @@ def handle_network_error(e: URLError):
         print('Failed to reach DNS server.')
     elif hasattr(e, 'code'):
         print('The server couldn\'t fulfill the request.')
+
+def decode_redis(src):
+    if isinstance(src, list):
+        rv = list()
+        for key in src:
+            rv.append(decode_redis(key))
+        return rv
+    elif isinstance(src, dict):
+        rv = dict()
+        for key in src:
+            rv[key.decode()] = decode_redis(src[key])
+        return rv
+    elif isinstance(src, bytes):
+        return src.decode()
+    else:
+        raise Exception("type not handled: " +type(src))

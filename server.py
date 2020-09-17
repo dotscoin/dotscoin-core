@@ -38,7 +38,7 @@ def run_threads():
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
     storage_process = multiprocessing.Process(target=start)
-    storage_process.start()
+    # storage_process.start()
 
 def node_start():
     node = Node()

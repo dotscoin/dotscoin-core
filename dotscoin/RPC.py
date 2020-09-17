@@ -39,7 +39,7 @@ class RPC:
             })
 
     def addtransaction(self, data):
-        tx = Transaction.from_json(data['body'])
+        tx = Transaction.from_json(data)
         mempool = Mempool()
         mempool.add_transaction(tx)
         UDPHandler.broadcastmessage(json.dumps({
