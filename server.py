@@ -40,37 +40,6 @@ def run_threads():
     storage_process = multiprocessing.Process(target=start)
     storage_process.start()
 
-# def add_my_node(my_node):
-#     body = json.dumps(my_node).encode('utf-8')
-#     url = "http://dns.dotscoin.com/add_node"
-#     headers = {'Content-Type':'application/json'}
-#     req = urllib.request.Request(url, body, headers) 
-#     try:
-#         response = urllib.request.urlopen(req).read()
-#         result = response
-#         print(result) 
-#     except urllib.error.HTTPError as error:
-#         print("The request failed with status code: " + str(error.code))
-#         print(error.info())
-#         print(json.loads(error.read()))  
-
-# def get_all_nodes():
-#     url = "http://dns.dotscoin.com/get_nodes"
-#     try:
-#         response = urllib.request.urlopen(url)
-#         result = response.read()
-#         print(result) 
-#     except urllib.error.HTTPError as error:
-#         print("The request failed with status code: " + str(error.code))
-#         print(error.info())
-#         print(json.loads(error.read()))
-#     return result
-
-# def store_nodes(all_nodes):
-#     redis_client = redis.Redis(host='localhost', port=6379, db=0)
-#     redis_client.rpush("nodes", json.dumps(all_nodes.decode('utf-8')))
-#     # print(redis_client.hgetall("nodes"))
-
 def node_start():
     node = Node()
     cpu_count()
