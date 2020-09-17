@@ -20,44 +20,9 @@ sock.bind((host, port))
 INVALID_DATA=False
 
 def response_handler(data):
-    keys=['body','command']
-    INVALID_DATA =False
-
-    for key in keys:
-        if not key in data.keys():
-            INVALID_DATA =True       
-    if INVALID_DATA:
-        response = {
-        "error":"invaid type of data"
-        }
-        return json.dumps(response)
-    else:
-        print(data)
-        if data['command'] == "sendtransaction":
-            udp_handler=UDPHandler()
-            udp_handler.sendtransaction(data)
-        elif data['command'] == "castvote":
-            udp_handler=UDPHandler()
-            udp_handler.castvote(data)
-        elif data['command'] == "sendblock":
-            udp_handler=UDPHandler()
-            udp_handler.sendblock(data)
-        elif data['command'] == "getblockbyheight":
-            udp_handler=UDPHandler()
-            udp_handler.getblockbyheight(data)
-        elif data['command'] == "getmempoollength":
-            udp_handler=UDPHandler()
-            udp_handler.getmempoollength(data)
-        elif data['command'] == "gettxbymindex":
-            udp_handler=UDPHandler()
-            udp_handler.gettxbymindex(data)
-        elif data['command'] == "getchainlength":
-            udp_handler=UDPHandler()
-            udp_handler.getchainlength(data)   
-        response = {
-        "message":"ok"
-        }
-        return json.dumps(response)
+    udp = UDPHandler()
+        
+    return udp.command_handler(json.loads(data))
     
 class UDPBroadcastReceiveServer():
     sock=sock    # Socket

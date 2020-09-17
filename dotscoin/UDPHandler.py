@@ -14,7 +14,7 @@ class UDPHandler:
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def __init__(self):
-        command_mapping = {
+        self.command_mapping = {
             "castvote": self.castvote,
             "getchainlength": self.getchainlength,
             "getblockbyheight": self.getblockbyheight,
@@ -25,11 +25,17 @@ class UDPHandler:
             "getallmtxhash": self.getallmtxhash,
             "gettxbyhash": self.gettxbyhash,
             "synctime": self.synctime,
-            "gettime": self.gettime
+            "gettime": self.gettime,
+            "ping": self.pingpong
         }
 
     @staticmethod
-    def sendmessage(message, sender_ip, sender_port):
+    def sendmessage(message, sender_ip):
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        raw = redis_client.hget("nodes_map", sender_ip)
+        sender_port = settings.UDP_RECEIVER_PORT
+        if raw is not None:
+            sender_port = json.loads(raw.decode("utf-8"))["receiver_port"]
         host = '0.0.0.0'
         port = settings.UDP_BROADCAST_PORT
         udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -52,6 +58,12 @@ class UDPHandler:
             udpsock.sendto(message.encode('utf-8'),
                            (ip_addr, data["receiver_port"]))
         udpsock.close()
+
+    def command_handler(self, data):
+        if "command" in data.keys():
+           return self.command_mapping[data['command']](data["body"], None)
+        elif "prev_command" in data.keys():
+           return self.command_mapping[data['prev_command']](None, data["body"])
 
     def castvote(self, data):
         self.broadcastmessage({
@@ -147,6 +159,16 @@ class UDPHandler:
             ts.set_time(int(raw["timestamp"]) +
                         int(redis_client.get("delay_time")))
 
-    def ping(self, request=None, response=None):
-        pass
+    def pingpong(self, request=None, response=None):
+        if response is not None:
+            self.sendmessage(json.dumps({
+                "prev_command": "ping",
+                "body" : {"reply": "pong"}
+            }), response["ip_addr"])
+            print("sent pong")
+
+        if request is not None:
+            self.sendmessage(json.dumps({
+                "command": "ping"
+            }))
 

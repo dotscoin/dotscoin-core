@@ -1,9 +1,10 @@
-import unittest
 import json
+import socket
+import settings
 from dotscoin.UDPHandler import UDPHandler
 from tests.addtransaction import addtransaction
 
-class TestUdp(unittest.TestCase):
+class TestUdp():
     
     udp = UDPHandler()
 
@@ -30,9 +31,19 @@ class TestUdp(unittest.TestCase):
         }))
 
     def test_ping(self):
-        self.udp.ping(json.dumps({
-                "command": "ping"
-            }))
+        # self.udp.ping(json.dumps({
+        #         "command": "ping"
+        #     }))
+        host = '0.0.0.0'
+        port = settings.UDP_BROADCAST_PORT
+        udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        udpsock.bind((host, port))
+        udpsock.sendto(json.dumps({
+                 "command": "ping"
+             }).encode('utf-8'), ("127.0.0.1", settings.UDP_RECEIVER_PORT))
+        udpsock.close()
 
 if __name__ == '__main__':
-    unittest.main()
+    tup = TestUdp()
+    tup.test_ping()
