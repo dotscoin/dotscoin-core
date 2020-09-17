@@ -33,8 +33,8 @@ def cpu_count():
 def run_threads():
     rpc=multiprocessing.Process(target=rpc_receive)
     rpc.start()
-    # receiver=multiprocessing.Process(target=broadcast_receive)
-    # receiver.start()
+    receiver=multiprocessing.Process(target=broadcast_receive)
+    receiver.start()
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
     storage_process = multiprocessing.Process(target=start)
