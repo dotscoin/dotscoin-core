@@ -61,9 +61,15 @@ class UDPHandler:
 
     def command_handler(self, data):
         if "command" in data.keys():
-           return self.command_mapping[data['command']](data["body"], None)
+            if "body" in data.keys():
+                self.command_mapping[data['command']](data["body"], None)
+            else:
+                self.command_mapping[data['command']](None, None)
         elif "prev_command" in data.keys():
-           return self.command_mapping[data['prev_command']](None, data["body"])
+            if "body" in data.keys():
+                self.command_mapping[data['prev_command']](None, data["body"])
+            else:
+                self.command_mapping[data['command']](None, None)
 
     def castvote(self, data):
         self.broadcastmessage({

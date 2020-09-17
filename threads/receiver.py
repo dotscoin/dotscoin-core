@@ -21,8 +21,7 @@ INVALID_DATA=False
 
 def response_handler(data):
     udp = UDPHandler()
-        
-    return udp.command_handler(json.loads(data))
+    udp.command_handler(data)
     
 class UDPBroadcastReceiveServer():
     sock=sock    # Socket
@@ -36,18 +35,7 @@ class UDPBroadcastReceiveServer():
         self.printwt('Socket created')
         self.printwt(f'Binding server to {host}:{port}...')
         self.printwt(f' Broadcasting and Receiving Server binded to {host}:{port}')
-   
-        
-    def wait_for_client(self):
-        ''' Wait for a client '''
-        try:
-            # receive message from a client
-                
-            # handle client's request
 
-            self.handle_request(data, client_address)
-        except OSError as err:
-            self.printwt(err)
     def shutdown_server(self):
 
 
@@ -67,12 +55,6 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
         response = response_handler(json.loads(data))
-
-        # send response to the client
-        self.printwt(f'[ RESPONSE to {client_address} ]')
-        with self.socket_lock:
-            self.sock.sendto(response.encode('utf-8'), client_address)
-        print('\n', response, '\n')
 
     def wait_for_client(self):
         ''' Wait for clients and handle their requests '''
