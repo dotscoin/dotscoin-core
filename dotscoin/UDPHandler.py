@@ -11,7 +11,8 @@ from dotscoin.TimeServer import TimeServer
 
 class UDPHandler:
 
-    redis_client = redis.Redis(host='localhost', port=6379, db=0)
+    def __init__(self):
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
     def __init__(self):
         self.command_mapping = {
@@ -62,12 +63,12 @@ class UDPHandler:
     def command_handler(self, data):
         if "command" in data.keys():
             if "body" in data.keys():
-                self.command_mapping[data['command']](data["body"], None)
+                self.command_mapping[data['command']](data, None)
             else:
                 self.command_mapping[data['command']](None, None)
         elif "prev_command" in data.keys():
             if "body" in data.keys():
-                self.command_mapping[data['prev_command']](None, data["body"])
+                self.command_mapping[data['prev_command']](None, data)
             else:
                 self.command_mapping[data['command']](None, None)
 
@@ -169,12 +170,11 @@ class UDPHandler:
         if response is not None:
             self.sendmessage(json.dumps({
                 "prev_command": "ping",
-                "body" : {"reply": "pong"}
+                "body": {"reply": "pong"}
             }), response["ip_addr"])
-            print("sent pong")
-
-        if request is not None:
+        elif request is not None:
+            print(request)
             self.sendmessage(json.dumps({
-                "command": "ping"
-            }))
-
+                "prev_command": "ping",
+                "body": {"reply": "pong"}
+            }), request["ip_addr"])

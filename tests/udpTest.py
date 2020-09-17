@@ -10,7 +10,8 @@ class TestUdp():
         udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udpsock.bind((host, port))
         udpsock.sendto(json.dumps({
-                 "command": "ping"
+                 "command": "ping",
+                 "body": {}
              }).encode('utf-8'), ("0.0.0.0", 6500))
         udpsock.close()
 

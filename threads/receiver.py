@@ -54,7 +54,10 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         data = data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
         print('\n', data, '\n')
-        response = response_handler(json.loads(data))
+        response = response_handler({
+            "ip_addr": client_address[0],
+            **json.loads(data)
+            })
 
     def wait_for_client(self):
         ''' Wait for clients and handle their requests '''

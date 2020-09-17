@@ -16,12 +16,14 @@ class TransactionStatus(str, Enum):
 
 
 class Transaction:
-    timestamp = time.time()
-    version: str = "0.0.1"
-    hash: str = ""
-    inputs: List[TransactionInput] = []
-    outputs: List[TransactionOutput] = []
-    block = "Mempool"
+
+    def __init__(self):
+        self.timestamp = time.time()
+        self.version: str = "0.0.1"
+        self.hash: str = ""
+        self.inputs: List[TransactionInput] = []
+        self.outputs: List[TransactionOutput] = []
+        self.block = "Mempool"
 
     def add_input(self, ti: TransactionInput):
         self.inputs.append(ti)

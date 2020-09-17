@@ -1,8 +1,9 @@
 class TransactionOutput:
 
-    value = 0
-    address= ""
-    n = 0
+    def __init__(self):
+        self.value = 0
+        self.address= ""
+        self.n = 0
 
     def to_json(self):
         return {

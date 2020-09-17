@@ -1,9 +1,11 @@
 class TransactionInput:
-    previous_tx = ""
-    index = 0
-    address = ""
-    scriptSig = []
-    verifying_key = []
+
+    def __init__(self):
+        self.previous_tx = ""
+        self.index = 0
+        self.address = ""
+        self.scriptSig = []
+        self.verifying_key = []
     
     def to_json(self):
         return {

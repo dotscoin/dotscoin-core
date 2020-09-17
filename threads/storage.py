@@ -33,7 +33,7 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = pickle.loads(client_socket.recv(BUFFER_SIZE))
+    received = pickle.loads(client_socket.recv())
     filename = received.file_name
     filesize = received.filesize 
     filetype = received.filetype
@@ -119,7 +119,7 @@ def file_send(n, filehash, fileaddr, file_name):
             "fileaddr" : fileaddr,
         }
         # send.send(f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{filetype}{SEPARATOR}{filehash}{SEPARATOR}{fileaddr}".encode())
-        send.send(pickle.dumps(info))
+        send.sendall(pickle.dumps(info))
         filehash = ""
         with open(filename, "rb") as f:
             filehash = get_hash(filename, 15)
