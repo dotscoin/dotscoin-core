@@ -110,7 +110,14 @@ description: >-
 }
 ```
 
+## JSON UDP Response Format
 
+```text
+{
+    "prev_command": <string>,
+    "body": <JSON Object>
+}
+```
 
 ## 
 
