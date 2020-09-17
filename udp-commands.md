@@ -14,6 +14,7 @@ description: >-
       <th style="text-align:left">Command</th>
       <th style="text-align:left">Description</th>
       <th style="text-align:left">Format</th>
+      <th style="text-align:left">Response</th>
     </tr>
   </thead>
   <tbody>
@@ -26,11 +27,17 @@ description: >-
         <p>&quot;representative&quot;: &lt;string&gt;</p>
         <p>}</p>
       </td>
+      <td style="text-align:left"></td>
     </tr>
     <tr>
       <td style="text-align:left">getchainlength</td>
       <td style="text-align:left">Get the total block chain length.</td>
       <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;length&quot;: &lt;int&gt;</p>
+        <p>}</p>
+      </td>
     </tr>
     <tr>
       <td style="text-align:left">getblockbyheight</td>
@@ -40,11 +47,21 @@ description: >-
         <p>&quot;height&quot;: &lt;int&gt;</p>
         <p>}</p>
       </td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;block&quot;: &lt;Block&gt;</p>
+        <p>}</p>
+      </td>
     </tr>
     <tr>
       <td style="text-align:left">getmempoollength</td>
       <td style="text-align:left">This returns the total transactions inside the mempool.</td>
       <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;length&quot;: &lt;int&gt;</p>
+        <p>}</p>
+      </td>
     </tr>
     <tr>
       <td style="text-align:left">gettxbymindex</td>
@@ -52,6 +69,11 @@ description: >-
       <td style="text-align:left">
         <p>{</p>
         <p>&quot;index&quot;: &lt;int&gt;</p>
+        <p>}</p>
+      </td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;tx&quot;: &lt;Transaction&gt;</p>
         <p>}</p>
       </td>
     </tr>
@@ -63,6 +85,7 @@ description: >-
         <p>&quot;tx&quot;: &lt;Transaction&gt;</p>
         <p>}</p>
       </td>
+      <td style="text-align:left"></td>
     </tr>
     <tr>
       <td style="text-align:left">sendblock</td>
@@ -72,12 +95,14 @@ description: >-
         <p>&quot;block&quot;: &lt;Block&gt;</p>
         <p>}</p>
       </td>
+      <td style="text-align:left"></td>
     </tr>
     <tr>
       <td style="text-align:left">getallmtxhash</td>
       <td style="text-align:left">This command returns the list of the transaction hashes in the mempool.</td>
       <td
       style="text-align:left"></td>
+        <td style="text-align:left"></td>
     </tr>
     <tr>
       <td style="text-align:left">gettxbyhash</td>
@@ -88,10 +113,12 @@ description: >-
         <p>&quot;hash&quot;: &lt;string&gt;</p>
         <p>}</p>
       </td>
+      <td style="text-align:left"></td>
     </tr>
     <tr>
       <td style="text-align:left">ping</td>
       <td style="text-align:left">This command checks the server UDP health.</td>
+      <td style="text-align:left"></td>
       <td style="text-align:left">
         <p>{</p>
         <p>&quot;reply&quot;: &quot;pong&quot;</p>
