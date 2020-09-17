@@ -11,8 +11,10 @@ class Mining:
         blkc = BlockChain()
 
         mempool_size = mempool.get_len()
+        if mempool_size == 0:
+            return
         while mempool_size > 0:
-            tx = mempool.get_tx_by_mindex(mempool_size - 1)
+            tx = mempool.get_transaction()
             block.add_transaction(tx)
             mempool_size -= 1
         

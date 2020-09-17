@@ -15,6 +15,7 @@ import threading
 import urllib.request
 import settings
 from dotscoin.UDPHandler import UDPHandler
+from dotscoin.Mining import Mining
 
 def bestblock(merkle_roots=[]):
     key_value = dict()
@@ -94,16 +95,22 @@ def mining():
         return
 
 def electionworker():
-    elec = Election()
-    elec.get_node_addr()
-    dels = worker()
-    print(dels)
-    is_del = False
-    if dels.count(elec.this_node_addr) > 0:
-        is_del = True
-        mining()
-    if is_del == False:
-        add_block_nondel()
+    while True:
+        mining = Mining()
+        time.sleep(10)
+        print("Entered mining")
+        mining.create_block()
+
+    # elec = Election()
+    # elec.get_node_addr()
+    # dels = worker()
+    # print(dels)
+    # is_del = False
+    # if dels.count(elec.this_node_addr) > 0:
+    #     is_del = True
+    #     mining()
+    # if is_del == False:
+    #     add_block_nondel()
 
 def add_block_nondel():
     context = zmq.Context()

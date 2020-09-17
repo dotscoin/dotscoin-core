@@ -1,11 +1,9 @@
-# all imports
 import os
 import hashlib
 import json
 import redis
 from typing import Any
 from mnemonic import Mnemonic
-# ECDSA algo for key generation
 from ecdsa import VerifyingKey, SigningKey, BadSignatureError
 from ecdsa import NIST384p
 from ecdsa.util import randrange_from_seed__trytryagain

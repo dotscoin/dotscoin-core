@@ -24,7 +24,7 @@ class Mempool:
         return self.redis_client.llen("mempool")
 
     def get_tx_by_mindex(self, i):
-        return Transaction.from_json(self.redis_client.lindex("mempool", i).decode("utf-8"))
+        return Transaction.from_json(json.loads(self.redis_client.lindex("mempool", i).decode("utf-8")))
 
     def get_transaction(self) -> Transaction:
         return Transaction.from_json(json.loads(self.redis_client.rpop("mempool").decode("utf-8")))
