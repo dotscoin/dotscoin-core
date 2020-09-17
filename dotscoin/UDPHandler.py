@@ -14,8 +14,6 @@ class UDPHandler:
 
     def __init__(self):
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
-
-    def __init__(self):
         self.command_mapping = {
             "castvote": self.castvote,
             "getchainlength": self.getchainlength,
