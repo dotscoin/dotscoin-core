@@ -89,7 +89,7 @@ def mining():
     full_verify_message = elec.verification.full_chain_verify()
     if full_verify_message == "verified":
         # braodcast the block you made
-        UDPHandler.broadcastmessage({'data': block, 'command': 'addblock'})
+        UDPHandler.sendblock(block)
     else:
         return
 

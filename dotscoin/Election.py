@@ -87,8 +87,10 @@ class Election:
         # add your vote to this node's this election's votes array
         self.votes[self.this_node_addr] = select
         # Broadcast the selected node to vote
-        UDPHandler.broadcastmessage(json.dumps(
-            {'data': {"voter_addr": self.this_node_addr, "voted_addr": select}, 'command': 'voteto'}))
+        UDPHandler.castvote(json.dumps(
+             {"node_addr": self.this_node_addr, "representative": select}))
+        # UDPHandler.broadcastmessage(json.dumps(
+        #     {'data': {"voter_addr": self.this_node_addr, "voted_addr": select}, 'command': 'voteto'}))
         # context = zmq.Context()
         # z2socket = context.socket(zmq.REQ)
         # z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
