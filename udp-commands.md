@@ -133,6 +133,26 @@ description: >-
         <p>}</p>
       </td>
     </tr>
+    <tr>
+      <td style="text-align:left">echo</td>
+      <td style="text-align:left">This command returns the same body in the response.</td>
+      <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;body&quot;: &lt;JSON Object&gt;</p>
+        <p>}</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:left">addnode</td>
+      <td style="text-align:left">This adds the new node into the local peer cache.</td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p></p>
+        <p>}</p>
+      </td>
+      <td style="text-align:left"></td>
+    </tr>
   </tbody>
 </table>
 

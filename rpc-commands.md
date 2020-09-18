@@ -150,6 +150,17 @@ description: >-
         <p>}</p>
       </td>
     </tr>
+    <tr>
+      <td style="text-align:left">getblockbyhash</td>
+      <td style="text-align:left"></td>
+      <td style="text-align:left">&lt;string&gt;</td>
+      <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p>{</p>
+        <p>&quot;block&quot;: &lt;Block&gt;</p>
+        <p>}</p>
+      </td>
+    </tr>
   </tbody>
 </table>
 
