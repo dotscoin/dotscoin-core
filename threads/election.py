@@ -95,10 +95,10 @@ def mining():
         return
 
 def electionworker():
+    election = Election()
     while True:
         mining = Mining()
-        time.sleep(10)
-        print("Entered mining")
+        time.sleep(60)
         mining.create_block()
 
     # elec = Election()

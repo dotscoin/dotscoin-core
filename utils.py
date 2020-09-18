@@ -1,9 +1,16 @@
 import socket
 from urllib.error import URLError
+import urllib
 
 def get_own_ip():
-    hostname = socket.gethostname()
-    return socket.gethostbyname(hostname)
+    try:
+        response = urllib.request.urlopen("http://checkip.amazonaws.com/")
+        raw = response.read().decode().replace('\n', '')
+        print(raw)
+        return raw
+    except URLError as e:
+        hostname = socket.gethostname()
+        return socket.gethostbyname(hostname)
 
 def handle_network_error(e: URLError):
     if hasattr(e, 'reason'):

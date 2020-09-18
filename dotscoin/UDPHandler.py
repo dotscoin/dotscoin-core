@@ -93,11 +93,11 @@ class UDPHandler:
 
     def sendtransaction(self, request=None, response=None):
         if request is not None:
-            tx = Transaction.from_json(data['body'])
+            tx = Transaction.from_json(request['body'])
             UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
         if response is not None:
             mm = Mempool()
-            tx = Transaction.from_json(data["tx"])
+            tx = Transaction.from_json(response["tx"])
             mm.add_transaction(tx)
             mm.close()
 
@@ -178,8 +178,19 @@ class UDPHandler:
                 "body": {"reply": "pong"}
             }), response["ip_addr"])
         elif request is not None:
-            print(request)
             self.sendmessage(json.dumps({
                 "prev_command": "ping",
                 "body": {"reply": "pong"}
+            }), request["ip_addr"])
+
+    def echo(self, request=None, response=None):
+        if response is not None:
+            self.sendmessage(json.dumps({
+                "prev_command": "echo",
+                "body": response["body"]
+            }), response["ip_addr"])
+        elif request is not None:
+            self.sendmessage(json.dumps({
+                "command": "echo",
+                "body": request["body"]
             }), request["ip_addr"])

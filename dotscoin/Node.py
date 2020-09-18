@@ -1,5 +1,5 @@
 import socket
-from utils import get_own_ip, handle_network_error
+from utils import decode_redis, get_own_ip, handle_network_error
 import settings
 import json
 import urllib
@@ -79,3 +79,21 @@ class Node:
                 print('Error: The json is malformed in node_data.json. Please fix the file or delete it.\n(Note: Deleting this file will cause your node main wallet signing key to be lost.)')
                 exit()
             read_file.close()
+
+    def synctime(self):
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        nodes_data = decode_redis(redis_client.hgetall("nodes_map"))
+        redis_client.close()
+
+    @staticmethod
+    def get_ip_from_addr(addr):
+        redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        nodes_data = decode_redis(redis_client.hgetall("nodes_map"))
+        for ip_addr, raw in nodes_data.keys():
+            data = json.loads(raw)
+            if data["node_addr"] == addr:
+                redis_client.close()
+                return ip_addr
+        redis_client.close()
+        return "Unknown"
+        
