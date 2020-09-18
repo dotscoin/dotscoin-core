@@ -19,7 +19,11 @@ class BlockChain:
         self.redis_client.rpush('chain', json.dumps(blk.to_json()))
 
     def get_block(self, index: int) -> Block:
-        return Block.from_json(json.loads(self.redis_client.lindex("chain", index).decode("utf-8")))
+        raw = self.redis_client.lindex("chain", index)
+        if raw is not None:
+            return Block.from_json(json.loads(raw.decode("utf-8")))
+        else:
+            return
 
     def get_length(self) -> int:
         return self.redis_client.llen("chain")
@@ -90,6 +94,16 @@ class BlockChain:
 
         return utxos
 
+    def get_tx_by_hash(self, hash: str):
+        chain_length = self.redis_client.llen('chain')
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex('chain', chain_length - 1).decode('utf-8')))
+            for tx in block.transactions:
+                if tx.hash == hash:
+                    return tx
+            chain_length -= 1
+
+        return
 
     def close(self):
         self.redis_client.close()

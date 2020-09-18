@@ -39,7 +39,10 @@ class RPC:
             })
 
     def addtransaction(self, data):
-        tx = Transaction.from_json(data)
+        tx = Transaction.from_json({
+            "block": "Mempool",
+            **data
+        })
         mempool = Mempool()
         mempool.add_transaction(tx)
         UDPHandler.broadcastmessage(json.dumps({
@@ -62,7 +65,16 @@ class RPC:
         })
 
     def getblockbyheight(self, data=None):
-        return self.redis_client.lindex('chain', data["parameters"]).decode("utf-8")
+        blkc = BlockChain()
+        block = blkc.get_block(data)
+        if block is not None:
+            return json.dumps({
+                "block": block.to_json()
+            })
+        else:
+            return json.dumps({
+                "error": "Block not found at this height"
+            })
 
     def gettxsbyaddress(self, data=None):
         blkc = BlockChain()
@@ -85,8 +97,18 @@ class RPC:
         return fetch_stakes
 
     def gettxbyhash(self, data=None):
-        tran = Transaction()
-        return tran.tx_by_hash(data["parameters"])
+        blkc = BlockChain()
+        tx = blkc.get_tx_by_hash(data)
+        blkc.close()
+
+        if tx is not None:
+            return json.dumps({
+                "tx": tx.to_json()
+            })
+        else:
+            return json.dumps({
+                "error": "Transaction not found"
+            })
 
     def pingpong(self, data=None):
         return json.dumps({
@@ -101,7 +123,8 @@ class RPC:
     def getallutxobyaddress(self, data=None):
         blkc = BlockChain()
         utxos_tuple = blkc.get_utxos_by_addr(data)
-        response = [{"tx": utxo[0], "index": utxo[1], "amount": utxo[2]} for utxo in utxos_tuple]
+        response = [{"tx": utxo[0], "index": utxo[1], "amount": utxo[2]}
+                    for utxo in utxos_tuple]
 
         return json.dumps({
             "utxos": response

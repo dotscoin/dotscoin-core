@@ -86,17 +86,3 @@ class Transaction:
             else:
                 return False
         return True
-
-    def tx_by_hash(self, hash):
-        i = 1
-        while True:
-            block = json.loads(self.redis_client.lindex(
-                'chain', i).decode('utf-8'))
-            if block == None:
-                return None
-            else:
-                for tx in block.txs:
-                    if tx.hash == hash:
-                        return tx
-            i = i + 1
-        return None
